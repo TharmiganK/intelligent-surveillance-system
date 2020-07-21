@@ -1,4 +1,4 @@
-#include "manager.h"
+#include "frameManager.h"
 
 void manager::enqueueFrame(cv::Mat newFrame) {
 
