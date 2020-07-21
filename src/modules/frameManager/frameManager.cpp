@@ -1,8 +1,15 @@
 #include "frameManager.h"
 
+FrameManager::FrameManager(int streamID, int maxQueueLength) {
+
+    this->FrameManager::streamID = streamID;
+    this->FrameManager::maxQueueLength = maxQueueLength;
+
+}
+
 void FrameManager::enqueueFrame(cv::Mat newFrame) {
 
-    if(FrameManager::queueLength() < 30) {
+    if(FrameManager::queueLength() < FrameManager::maxQueueLength) {
         // std::cout << "FREE SPACE" << std::endl;
         frameQueue.push_back(newFrame);
     }
@@ -19,7 +26,7 @@ cv::Mat FrameManager::dequeueFrame() {
     cv::Mat frame = frameQueue.front();
     frameQueue.pop_front();
     return frame;
-    
+
 }
 
 int FrameManager::queueLength() {

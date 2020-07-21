@@ -9,7 +9,7 @@
 int main()
 {
 
-    FrameManager m1;
+    FrameManager m1(1, 30);
     std::deque<cv::Mat>myList;
     XInitThreads();
 	int max = 1000;

@@ -9,9 +9,13 @@
 class FrameManager {
 
     public:
+        int streamID;
         std::deque<cv::Mat>frameQueue;
+        int maxQueueLength;
 
-        void enqueueFrame(cv::Mat img);
+        FrameManager(int streamID, int maxQueueLength);
+
+        void enqueueFrame(cv::Mat newFrame);
 
         cv::Mat dequeueFrame();
 
