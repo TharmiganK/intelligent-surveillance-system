@@ -1,41 +1,42 @@
 #include "frameManager.h"
 
-void manager::enqueueFrame(cv::Mat newFrame) {
+void FrameManager::enqueueFrame(cv::Mat newFrame) {
 
-    if(manager::queueLength() < 30) {
+    if(FrameManager::queueLength() < 30) {
         // std::cout << "FREE SPACE" << std::endl;
         frameQueue.push_back(newFrame);
     }
     else {
-        manager::dropFrame();
+        FrameManager::dropFrame();
         frameQueue.push_back(newFrame);
     }
             
 }
 
-cv::Mat manager::dequeueFrame() {
+cv::Mat FrameManager::dequeueFrame() {
 
     // std::lock_guard<std::mutex> guard(myMutex);
     cv::Mat frame = frameQueue.front();
     frameQueue.pop_front();
-
+    return frame;
+    
 }
 
-int manager::queueLength() {
+int FrameManager::queueLength() {
 
     // std::lock_guard<std::mutex> guard(myMutex);
     return frameQueue.size();
 
 }
 
-bool manager::queueIsEmpty() {
+bool FrameManager::queueIsEmpty() {
 
     // std::lock_guard<std::mutex> guard(myMutex);
     return frameQueue.empty();
 
 }
 
-void manager::dropFrame() {
+void FrameManager::dropFrame() {
 
     frameQueue.pop_front();
     std::cout << "FRAME DROPPED" << std::endl;
