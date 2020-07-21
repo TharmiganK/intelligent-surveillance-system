@@ -10,10 +10,10 @@
 ## Usage
 
 ```
-cd App
+cd src
 ```
 ```
-g++ -w main.cpp ../modules/frameManager/manager.cpp ../modules/decoder/decoder.cpp ../modules/display/display.cpp -o main -std=c++0x -pthread -lX11 $(pkg-config --cflags --libs libavformat libswscale libavcodec libavutil opencv4)
+g++ -w main.cpp modules/frameManager/manager.cpp modules/decoder/decoder.cpp modules/display/display.cpp -o main -std=c++0x -pthread -lX11 $(pkg-config --cflags --libs libavformat libswscale libavcodec libavutil opencv4)
 ```
 
 
