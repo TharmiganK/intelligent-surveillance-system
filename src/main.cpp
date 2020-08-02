@@ -1,23 +1,42 @@
-//g++ -w main.cpp modules/frameManager/frameManager.cpp modules/decoder/decoder.cpp modules/display/display.cpp -o main -std=c++0x -pthread -lX11 $(pkg-config --cflags --libs libavformat libswscale libavcodec libavutil opencv4)
+/**
+   Intelligent Surveillance System
+   @file main.cpp
+   @author Lavinan Selvaratnam
+*/
+
+#include <iostream>
 #include <opencv2/opencv.hpp>
 #include <thread>
 #include <X11/Xlib.h>
-#include "modules/decoder/decoder.h"
+#include <boost/log/trivial.hpp>
+#include "modules/streamReceiver/streamReceiver.h"
 #include "modules/display/display.h"
 #include "modules/frameManager/frameManager.h"
+#include "modules/packetManager/packetManager.h"
 
-int main()
-{
+/**
+   @brief Main function
+   @details Temporary main function to instantiate Stream Receiver, Display, Frame and Packet Queues
+   for a single stream and start receiving and displaying frames as a seperate thread.
+   Compressed frames (called as packets here) are received by Stream Receiver and stored in a queue 
+   with Packet Manager. Where decoder consumes the packets, decodes them and stores the decoded frames
+   in another queue with Frame Manager. Display consumes the decoded frames and displays them.
+*/
+int main() {
 
-    FrameManager m1(1, 30);
-    std::deque<cv::Mat>myList;
+    //Creating managers to manage packets and frames
+    PacketManager packetManager1(1, 30);
+    FrameManager frameManager1(1, 30);
+    
+    //Creating seperate threads to receive the frames and display
     XInitThreads();
-	int max = 1000;
-    std::thread decoder1(decoder(),&m1);
-	std::thread display1(display(), &m1);
+    std::thread streamReceiver1(StreamReceiver(),&packetManager1,&frameManager1);
+	std::thread display1(display(), &frameManager1);
 
-    decoder1.join();
+    //Waiting until the processes are over
+    streamReceiver1.join();
     display1.join();
 
 	return 0;
+
 }
