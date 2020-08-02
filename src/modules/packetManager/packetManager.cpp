@@ -1,20 +1,20 @@
 /**
-   Intelligent Surveillance System
-   @file packetManager.cpp
-   @author Lavinan Selvaratnam
+    Intelligent Surveillance System
+    @file packetManager.cpp
+    @author Lavinan Selvaratnam
 */
 
 /**
-   @todo Abstract as a generic queue manager class
-   @todo unit test
-   @todo Change the queue with static memory
+    @todo Abstract as a generic queue manager class
+    @todo unit test
+    @todo Change the queue with static memory
 */
 
 #include "packetManager.h"
 
 /**
-   @details Constructor of PacketManager to define the camera stream ID associated and to
-   define the maximum number of packets that should be allowed to be present in the queue.
+    @details Constructor of PacketManager to define the camera stream ID associated and to
+    define the maximum number of packets that should be allowed to be present in the queue.
 */
 PacketManager::PacketManager(int streamID, int maxQueueLength) {
 
@@ -24,9 +24,9 @@ PacketManager::PacketManager(int streamID, int maxQueueLength) {
 }
 
 /**
-   @details Adds the packet passed as argument at the end of the frame queue.
-   If the queue is full it drops a packet and then add the new one.
-   @sa dropPacket()
+    @details Adds the packet passed as argument at the end of the frame queue.
+    If the queue is full it drops a packet and then add the new one.
+    @sa dropPacket()
 */
 void PacketManager::enqueuePacket(AVPacket newPacket) {
 
@@ -41,7 +41,7 @@ void PacketManager::enqueuePacket(AVPacket newPacket) {
 }
 
 /**
-   @details Takes the first packet out of the queue and returns it
+    @details Takes the first packet out of the queue and returns it
 */
 AVPacket PacketManager::dequeuePacket() {
 
@@ -52,7 +52,7 @@ AVPacket PacketManager::dequeuePacket() {
 }
 
 /**
-   @details Checks the number of packet currently present inside the queue
+    @details Checks the number of packet currently present inside the queue
 */
 int PacketManager::queueLength() {
 
@@ -61,7 +61,7 @@ int PacketManager::queueLength() {
 }
 
 /**
-   @details Checks whether there is any packet present inside the queue
+    @details Checks whether there is any packet present inside the queue
 */
 bool PacketManager::queueIsEmpty() {
 
@@ -70,10 +70,10 @@ bool PacketManager::queueIsEmpty() {
 }
 
 /**
-   @details Drops the first packet inside the queue. This is used to make space
-   before adding a new one when the queue is full
-   @sa enqueuePacket()
-   @todo change the logic to drop a frame based on difference
+    @details Drops the first packet inside the queue. This is used to make space
+    before adding a new one when the queue is full
+    @sa enqueuePacket()
+    @todo change the logic to drop a frame based on difference
 */
 void PacketManager::dropPacket() {
 

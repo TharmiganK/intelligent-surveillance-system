@@ -1,7 +1,7 @@
 /**
-   Intelligent Surveillance System
-   @file frameManager.h
-   @author Lavinan Selvaratnam
+    Intelligent Surveillance System
+    @file frameManager.h
+    @author Lavinan Selvaratnam
 */
 
 #ifndef _FRAMEMANAGER_H

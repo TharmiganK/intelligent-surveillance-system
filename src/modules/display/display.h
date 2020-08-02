@@ -1,7 +1,7 @@
 /**
-   Intelligent Surveillance System
-   @file display.h
-   @author Lavinan Selvaratnam
+    Intelligent Surveillance System
+    @file display.h
+    @author Lavinan Selvaratnam
 */
 
 #include "../frameManager/frameManager.h"
