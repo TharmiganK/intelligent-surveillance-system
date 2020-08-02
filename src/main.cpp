@@ -1,8 +1,12 @@
 /**
-   Intelligent Surveillance System
-   @file main.cpp
-   @author Lavinan Selvaratnam
+    Intelligent Surveillance System
+    @file main.cpp
+    @author Lavinan Selvaratnam
 */
+
+/**
+    @todo Create makefile
+ */
 
 #include <iostream>
 #include <opencv2/opencv.hpp>
@@ -15,12 +19,12 @@
 #include "modules/packetManager/packetManager.h"
 
 /**
-   @brief Main function
-   @details Temporary main function to instantiate Stream Receiver, Display, Frame and Packet Queues
-   for a single stream and start receiving and displaying frames as a seperate thread.
-   Compressed frames (called as packets here) are received by Stream Receiver and stored in a queue 
-   with Packet Manager. Where decoder consumes the packets, decodes them and stores the decoded frames
-   in another queue with Frame Manager. Display consumes the decoded frames and displays them.
+    @brief Main function
+    @details Temporary main function to instantiate Stream Receiver, Display, Frame and Packet Queues
+    for a single stream and start receiving and displaying frames as a seperate thread.
+    Compressed frames (called as packets here) are received by Stream Receiver and stored in a queue 
+    with Packet Manager. Where decoder consumes the packets, decodes them and stores the decoded frames
+    in another queue with Frame Manager. Display consumes the decoded frames and displays them.
 */
 int main() {
 
