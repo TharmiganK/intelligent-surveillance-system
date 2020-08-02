@@ -34,9 +34,7 @@ void FrameManager::enqueueFrame(cv::Mat newFrame) {
 
         frameQueue.push_back(newFrame);
 
-    }
-    
-    else {
+    } else {
 
         FrameManager::dropFrame();
         frameQueue.push_back(newFrame);

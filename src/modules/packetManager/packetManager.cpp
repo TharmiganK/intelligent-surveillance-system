@@ -31,11 +31,14 @@ PacketManager::PacketManager(int streamID, int maxQueueLength) {
 void PacketManager::enqueuePacket(AVPacket newPacket) {
 
     if(PacketManager::queueLength() < PacketManager::maxQueueLength) {
+
         packetQueue.push_back(newPacket);
-    }
-    else {
+
+    } else {
+
         PacketManager::dropPacket();
         packetQueue.push_back(newPacket);
+        
     }
             
 }
