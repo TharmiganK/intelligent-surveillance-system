@@ -1,3 +1,5 @@
+//This is a mock decoder
+
 #include "../frameManager/frameManager.h"
 #include "../packetManager/packetManager.h"
 #include <fstream>

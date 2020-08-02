@@ -1,3 +1,5 @@
+//This is a mock decoder
+
 #include "decoder.h"
 
     Decoder::Decoder(AVCodecContext *codec_ctx) {

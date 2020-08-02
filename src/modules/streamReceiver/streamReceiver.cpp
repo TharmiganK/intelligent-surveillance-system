@@ -1,3 +1,5 @@
+//This is a mock stream receiver
+
 #include "streamReceiver.h"
 
 

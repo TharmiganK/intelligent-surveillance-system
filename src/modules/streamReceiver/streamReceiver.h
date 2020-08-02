@@ -1,3 +1,5 @@
+//This is a mock stream receiver
+
 #include "../frameManager/frameManager.h"
 #include "../packetManager/packetManager.h"
 #include "../decoder/decoder.h"
