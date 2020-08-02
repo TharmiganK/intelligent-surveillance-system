@@ -6,6 +6,7 @@
 
 /**
     @todo Create makefile
+    @todo Create configs class
  */
 
 #include <iostream>
