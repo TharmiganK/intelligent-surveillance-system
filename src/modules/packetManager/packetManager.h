@@ -10,7 +10,7 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <boost/log/trivial.hpp>
-#include <deque>
+#include <boost/circular_buffer.hpp>
 #include <mutex>
 extern "C" {
 #include <libavcodec/avcodec.h>
@@ -21,7 +21,7 @@ extern "C" {
 
 /**
     @class Class to manage the packet queue which contains packets which are the compressed frames
-    @details PacketManager has a queue to store the packets temporarily until
+    @details PacketManager has a thread safety queue to store the packets temporarily until
     it is accessed. When queue is full it drops the first packet before adding a new one.
 */
 class PacketManager {
@@ -29,17 +29,17 @@ class PacketManager {
     private:
 
         int streamID; /*!< ID of the associated video stream */
-        std::deque<AVPacket> packetQueue; /*!< Queue to keep the incoming frames */
-        int maxQueueLength; /*!< Maximum number of frames that can be present inside the queue */
-
+        boost::circular_buffer<AVPacket> packetQueue; /*!< A circular buffer queue to keep the incoming frames */
+        int queueCapacity; /*!< Maximum number of frames that can be present inside the queue */
+        std::mutex mutexForQueue; /*!< Mutex to give exclusive access to the queue */
     public:
 
         /**
             @brief Constructor of class PacketManager.
             @param streamID ID of the associated camera stream.
-            @param maxQueueLength maximum number of packets that can exist in the queue.
+            @param queueCapacity maximum number of packets that can exist in the queue.
         */
-        PacketManager(int streamID, int maxQueueLength);
+        PacketManager(int streamID, int queueCapacity);
 
         /**
             @brief To add a packet at the end of queue.

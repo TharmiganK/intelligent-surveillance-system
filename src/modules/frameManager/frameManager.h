@@ -10,12 +10,12 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <boost/log/trivial.hpp>
-#include <deque>
+#include <boost/circular_buffer.hpp>
 #include <mutex>
 
 /**
     @class Class to manage the frame queue
-    @details FrameManager has a queue to store the decoded frames temporarily until
+    @details FrameManager has a thread safety queue to store the decoded frames temporarily until
     it is accessed. When queue is full it drops the first frame before adding a new one.
 */
 class FrameManager {
@@ -23,17 +23,18 @@ class FrameManager {
     private:
 
         int streamID; /*!< ID of the associated video stream */
-        std::deque<cv::Mat>frameQueue; /*!< Queue to keep the incoming frames */
-        int maxQueueLength; /*!< Maximum number of frames that can be present inside the queue */
+        boost::circular_buffer<cv::Mat> frameQueue; /*!< A circular buffer queue to keep the incoming frames */
+        int queueCapacity; /*!< Maximum number of frames that can be present inside the queue */
+        std::mutex mutexForQueue; /*!< Mutex to give exclusive access to the queue */
 
     public:
 
         /**
             @brief Constructor of class FrameManager.
             @param streamID ID of the associated camera stream.
-            @param maxQueueLength maximum number of frames that can exist in the queue.
+            @param queueCapacity maximum number of frames that can exist in the queue.
         */
-        FrameManager(int streamID, int maxQueueLength);
+        FrameManager(int streamID, int queueCapacity);
 
         /**
             @brief To add a frame at the end of queue.
