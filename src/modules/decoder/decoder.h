@@ -36,6 +36,7 @@ class Decoder {
         int height; /*!< Height of the decoded frame */
         int bufferImgSize; /*!< Image buffer size from video codec */
         uint8_t *buffer; /*!< Buffer image used for YUV to BGR conversion */
+        AVCodec* videoCodec; /*!< Video codec decoder */
 
     public:
 
@@ -60,6 +61,12 @@ class Decoder {
                                         Decoder::codec_ctx->width, Decoder::codec_ctx->height, AV_PIX_FMT_BGR24,
                                         SWS_BICUBIC, NULL, NULL, NULL);
 
+            videoCodec = avcodec_find_decoder(codec_ctx->codec_id);
+
+            if (videoCodec)
+            {
+                avcodec_open2(codec_ctx, videoCodec, NULL);
+            }
 
         }
 
