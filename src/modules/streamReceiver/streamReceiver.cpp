@@ -23,7 +23,7 @@ void StreamReceiver::operator()(PacketManager *packetManager, FrameManager *fram
 
             //open RTSP
             std::cout << "CONNECTING" << std::endl;
-            if (avformat_open_input(&format_ctx, "rtsp://admin:admin@192.168.1.6:8554/live",
+            if (avformat_open_input(&format_ctx, "rtsp://admin:admin@192.168.1.5:8554/live",
                     NULL, NULL) != 0) {
                 return;
             }

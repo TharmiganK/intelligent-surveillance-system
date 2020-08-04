@@ -18,6 +18,7 @@
 #include "modules/display/display.h"
 #include "modules/frameManager/frameManager.h"
 #include "modules/packetManager/packetManager.h"
+#include "modules/videoStream/videoStream.h"
 
 /**
     @brief Main function
@@ -32,11 +33,14 @@ int main() {
     //Creating managers to manage packets and frames
     PacketManager packetManager1(1, 30);
     FrameManager frameManager1(1, 30);
-    
+    VideoStream v1(1,"googlegoogle");
+    VideoStream v2(1,"googlegooe");
     //Creating seperate threads to receive the frames and display
     XInitThreads();
-    std::thread streamReceiver1(StreamReceiver(),&packetManager1,&frameManager1);
-	std::thread display1(display(), &frameManager1);
+    std::thread streamReceiver1(StreamReceiver(),v1.packetManager,v1.frameManager);
+    std::thread streamReceiver2(StreamReceiver(),v2.packetManager,v2.frameManager);
+	std::thread display1(display(), v1.frameManager);
+    std::thread display2(display(), v2.frameManager);
 
     //Waiting until the processes are over
     streamReceiver1.join();
