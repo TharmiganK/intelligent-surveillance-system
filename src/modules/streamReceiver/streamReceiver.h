@@ -35,7 +35,7 @@ class StreamReceiver {
 
     private:
 
-        AVFormatContext* formatCtx; /*!< RTSp stream format context information */
+        AVFormatContext* formatCtx; /*!< RTSP stream format context information */
         AVCodecContext* videoCodecCtx; /*!< Video codec context information */
         int videoStreamIndex; /*!< The index of the video stream in the RTSP stream */
         bool isOpen; /*!< Value to indicate whether the stream is opened or not */
