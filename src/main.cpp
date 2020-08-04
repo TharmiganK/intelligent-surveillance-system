@@ -29,13 +29,15 @@
 */
 int main() {
 
+    std::string stream_url = "rtsp://192.168.1.10:8080/h264_ulaw.sdp";
+
     //Creating managers to manage packets and frames
     PacketManager packetManager1(1, 30);
     FrameManager frameManager1(1, 30);
     
     //Creating seperate threads to receive the frames and display
     XInitThreads();
-    std::thread streamReceiver1(StreamReceiver(),&packetManager1,&frameManager1);
+    std::thread streamReceiver1(StreamReceiver(stream_url),&packetManager1,&frameManager1);
 	std::thread display1(display(), &frameManager1);
 
     //Waiting until the processes are over
