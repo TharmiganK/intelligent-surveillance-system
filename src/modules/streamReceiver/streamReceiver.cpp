@@ -1,186 +1,198 @@
-//This is a mock stream receiver
+/**
+    Intelligent Surveillance System
+    @file streamReceiver.cpp
+    @author Tharmigan Krishnananthalingam
+*/
 
 #include "streamReceiver.h"
 
-
-
-void StreamReceiver::setContext(AVCodecContext *codec_ctx) {
-            this->StreamReceiver::codec_ctx = codec_ctx;
-    }
 void StreamReceiver::operator()(PacketManager *packetManager, FrameManager *frameManager) {
-            //imshow( "Display window", image );                   // Show our image inside it.
-            //waitKey(0);
 
-            // Open the initial context variables that are needed
-        //     SwsContext *img_convert_ctx;
-            AVFormatContext* format_ctx = avformat_alloc_context();
-            AVCodecContext* codec_ctx = NULL;
-            int video_stream_index;
+    OpenStream(stream_url);
 
-            // Register everything
-            av_register_all();
-            avformat_network_init();
+    AVPacket packet;
+    av_init_packet(&packet);
 
-            //open RTSP
-            std::cout << "CONNECTING" << std::endl;
-            if (avformat_open_input(&format_ctx, "rtsp://admin:admin@192.168.1.6:8554/live",
-                    NULL, NULL) != 0) {
-                return;
-            }
-            if (avformat_find_stream_info(format_ctx, NULL) < 0) {
-                return;
-            }
-            //search video stream
-            for (int i = 0; i < format_ctx->nb_streams; i++) {
-                if (format_ctx->streams[i]->codec->codec_type == AVMEDIA_TYPE_VIDEO)
-                    video_stream_index = i;
-            }
+    std::thread d1(Decoder(videoCodecCtx),frameManager,packetManager);
+    
+    int cnt = 0;
 
-            AVPacket packet;
-            AVPacket dpacket;
-            av_init_packet(&packet);
-            av_init_packet(&dpacket);
-            
+    while (cnt < 1000){
 
-            //open output file
-            AVFormatContext* output_ctx = avformat_alloc_context();
+        packet = GetVideoPacket();
 
-            AVStream* stream = NULL;
-            int cnt = 0;
-            //start reading packets from stream and write them to file
-            av_read_play(format_ctx);    //play RTSP
+        packetManager->enqueuePacket(*av_packet_clone(&packet));
 
-            // Get the codec
-            AVCodec *codec = NULL;
-            codec = avcodec_find_decoder(AV_CODEC_ID_H264);
-            if (!codec) {
-                exit(1);
-            }
+        av_free_packet(&packet);
+        av_init_packet(&packet);
 
-            // Add this to allocate the context by codec
-            codec_ctx = avcodec_alloc_context3(codec);
-
-            avcodec_get_context_defaults3(codec_ctx, codec);
-            avcodec_copy_context(codec_ctx, format_ctx->streams[video_stream_index]->codec);
-            std::ofstream output_file;
-
-            if (avcodec_open2(codec_ctx, codec, NULL) < 0)
-                exit(1);
-
-        //     img_convert_ctx = sws_getContext(codec_ctx->width, codec_ctx->height,
-        //             codec_ctx->pix_fmt, codec_ctx->width, codec_ctx->height, AV_PIX_FMT_BGR24,
-        //             SWS_BICUBIC, NULL, NULL, NULL);
-        
-            // std::deque<cv::Mat> queue;
-        //     int size = avpicture_get_size(AV_PIX_FMT_YUV420P, codec_ctx->width,
-        //             codec_ctx->height);
-        //     uint8_t* picture_buffer = (uint8_t*) (av_malloc(size));
-        //     AVFrame* picture = av_frame_alloc();
-        //     AVFrame* picture_rgb = av_frame_alloc();
-        //     int size2 = avpicture_get_size(AV_PIX_FMT_RGB24, codec_ctx->width,
-        //             codec_ctx->height);
-        //     uint8_t* picture_buffer_2 = (uint8_t*) (av_malloc(size2));
-        //     avpicture_fill((AVPicture *) picture, picture_buffer, AV_PIX_FMT_YUV420P,
-        //             codec_ctx->width, codec_ctx->height);
-        //     avpicture_fill((AVPicture *) picture_rgb, picture_buffer_2, AV_PIX_FMT_RGB24,
-        //             codec_ctx->width, codec_ctx->height);
-            std::cout << "STARTING TO LISTEN" << std::endl;
-
-        //     AVFrame* picturex = av_frame_alloc();
-        //     uint8_t* picture_buffer_x = (uint8_t*) (av_malloc(size2));
-        //     avpicture_fill((AVPicture *) picturex, picture_buffer_x, AV_PIX_FMT_RGB24,
-        //             codec_ctx->width, codec_ctx->height);
-            cv::Mat m2 = cv::Mat(1,1, CV_64F, cv::Scalar(0.));
-            int cc = 0;
-            StreamReceiver::setContext(codec_ctx);
-
-        //     Decoder d1(codec_ctx);
-
-            std::thread d1(Decoder(codec_ctx),frameManager,packetManager);
-            while (av_read_frame(format_ctx, &packet) >= 0 && cnt < 10000) { //read ~ 1000 frames
-
-                if (packet.stream_index == video_stream_index) {    //packet is video
-                    if (stream == NULL) {    //create stream in file
-                        std::cout << "Packet received" << std::endl;
-                        stream = avformat_new_stream(output_ctx,
-                                format_ctx->streams[video_stream_index]->codec->codec);
-                        avcodec_copy_context(stream->codec,
-                                format_ctx->streams[video_stream_index]->codec);
-                        stream->sample_aspect_ratio =
-                                format_ctx->streams[video_stream_index]->codec->sample_aspect_ratio;
-                    }
-                    int check = 0;
-                    packet.stream_index = stream->id;
-                    packetManager->enqueuePacket(*av_packet_clone(&packet));
-                //     pq.push_back();
-                //     packet = pq.front();
-                //     pq.pop_front();
-                        av_free_packet(&packet);
-                        av_init_packet(&packet);
-                    std::cout<< "PACKET LENGTH : " << packetManager->queueLength() << std::endl;
-
-                //     decode(packetManager, frameManager, codec_ctx, img_convert_ctx, picture, picture_rgb);
-                //     dpacket = packetManager->dequeuePacket();
-                //     d1.decode(frameManager,packetManager);
-
-                //     int result = avcodec_decode_video2(codec_ctx, picture, &check, &dpacket);
-                //     std::cout << "Decoded frame: " << cnt << std::endl;
-                //         av_free_packet(&dpacket);
-                //         av_init_packet(&dpacket);
-                // //     pq.pop_front();
-                // //     std::cout << "Bytes decoded " << result << " check " << check << std::endl;
-                //     sws_scale(img_convert_ctx, picture->data, picture->linesize, 0,
-                //                 codec_ctx->height, picture_rgb->data, picture_rgb->linesize);
-                //     cv::Mat image(codec_ctx->height, codec_ctx->width, CV_8UC3, picture_rgb->data[0], picture_rgb->linesize[0]);
-                //     // queue.push_back(image.clone());
-                //     // imshow("frame", image);
-                //     // waitKey(10);
-                //     cc = cc + 1;
-                //     // std::lock_guard<std::mutex> guard(myMutex);
-                //     frameManager->enqueueFrame(image.clone());
-                    // qq->push_back(image.clone());
-                //     if (cnt == 200)    //cnt < 0)
-                //             {
-                //         // picture_buffer_x = picture_buffer_2;
-                //         std::stringstream file_name;
-                //         file_name << "test" << cnt << ".ppm";
-                //         output_file.open(file_name.str().c_str());
-                //         output_file << "P3 " << codec_ctx->width << " " << codec_ctx->height
-                //                 << " 255\n";
-                //         for (int y = 0; y < codec_ctx->height; y++) {
-                //             for (int x = 0; x < codec_ctx->width * 3; x++)
-                //                 output_file
-                //                         << (int) (picture_rgb->data[0]
-                //                                 + y * picture_rgb->linesize[0])[x] << " ";
-                //         }
-                //         output_file.close();
-                //     }
-                    cnt++;
-                }
-
-            }
-        //     av_free(picture);
-        //     av_free(picture_rgb);
-        //     av_free(picturex);
-        //     av_free(picture_buffer);
-        //     av_free(picture_buffer_2);
-        //     av_free(picture_buffer_x);
-            av_read_pause(format_ctx);
-            avio_close(output_ctx->pb);
-            avformat_free_context(output_ctx);
+        cnt ++;
 
     }
 
-//     void StreamReceiver::decode(FrameManager *frameManager, PacketManager *packetManager,AVCodecContext *codec_ctx, SwsContext *img_convert_ctx, AVFrame *picture, AVFrame *picture_rgb) {
-//                     int check = 0;
-//                     AVPacket dpacket;
-//                     av_init_packet(&dpacket);
-//                     dpacket = packetManager->dequeuePacket();
-//                     int result = avcodec_decode_video2(codec_ctx, picture, &check, &dpacket);
-//                     std::cout << "Decoded frame: " << std::endl;
-//                     sws_scale(img_convert_ctx, picture->data, picture->linesize, 0,
-//                                 codec_ctx->height, picture_rgb->data, picture_rgb->linesize);
-//                     cv::Mat image(codec_ctx->height, codec_ctx->width, CV_8UC3, picture_rgb->data[0], picture_rgb->linesize[0]);
-//                     // std::lock_guard<std::mutex> guard(myMutex);
-//                     frameManager->enqueueFrame(image.clone());
-//     }
+    av_free_packet(&packet);
+    CloseStream();        
+
+}
+
+/**
+    @details OpenStream method opens the RTSP stream by accepting the RTSP
+    URL and configuresfps and basetime in addition to format context of 
+    the stream.
+*/
+bool StreamReceiver::OpenStream (std::string& inputStream){
+
+    stream_url = inputStream;
+
+    CloseStream();
+
+    // Register all components
+    av_register_all();
+    avformat_network_init();
+
+    // Open media stream.
+    if (avformat_open_input(&formatCtx, inputStream.c_str(), NULL, NULL) != 0){
+
+        CloseStream();
+        return false;
+
+    }
+
+    // Get format info.
+    if (avformat_find_stream_info(formatCtx, NULL) < 0){
+
+        CloseStream();
+        return false;
+
+    }
+
+    // open video stream.
+    bool hasVideo = OpenVideoStream();
+
+    if (!hasVideo){
+
+        CloseStream();
+        return false;
+
+    }
+
+    isOpen = true;
+
+    // Get stream information.
+    if (videoStreamIndex != -1){
+
+        videoFPS            = av_q2d(formatCtx->streams[videoStreamIndex]->r_frame_rate);
+        // Need for convert time to ffmpeg time.
+        videoBaseTime       = av_q2d(formatCtx->streams[videoStreamIndex]->time_base); 
+
+    }
+
+    return true;
+
+}
+
+/**
+    @details OpenStream method closes the RTSP stream and close the 
+    format context for the stream if created.
+*/
+bool StreamReceiver::CloseStream(){
+
+    isOpen = false;
+
+    // Close video.
+    CloseVideoStream();
+
+    if (formatCtx){
+
+        avformat_close_input(&formatCtx);
+        formatCtx = NULL;
+
+    }
+
+    return true;
+
+}
+
+/**
+    @details OpenStream method searches for video stream and configures
+    the video stream index and obtains the video codec information from 
+    the video stream and update the videoCodecCtx.
+*/
+bool StreamReceiver::OpenVideoStream(){
+
+    bool res = false;
+
+    if (formatCtx){
+
+        videoStreamIndex = -1;
+
+        for (unsigned int i = 0; i < formatCtx->nb_streams; i++){
+
+            if (formatCtx->streams[i]->codec->codec_type == AVMEDIA_TYPE_VIDEO){
+
+                videoStreamIndex = i;
+                videoCodecCtx = formatCtx->streams[i]->codec;
+                res = true;
+
+                break;
+
+            }
+        }
+    }
+
+    return res;
+
+}
+
+/**
+    @details CloseVideoStream closes the video codec context if created
+    and removes the videoStreamIndex;
+*/
+void StreamReceiver::CloseVideoStream(){
+
+    if (videoCodecCtx){
+
+        avcodec_close(videoCodecCtx);
+        videoCodecCtx = NULL;
+        videoStreamIndex = -1;
+
+    }
+
+}
+
+/**
+    @details GetVideoPacket method returns the video packets from the
+    RTSP stream.
+*/
+AVPacket StreamReceiver::GetVideoPacket(){
+
+    AVPacket packet;
+    packet = AVPacket();
+ 
+    if (videoStreamIndex != -1){
+
+        if (isOpen){
+
+            //Read packet.
+            while (av_read_frame(formatCtx, &packet) >= 0){
+
+                int64_t pts = 0;
+                pts = (packet.dts != AV_NOPTS_VALUE) ? packet.dts : 0;
+
+                if(packet.stream_index == videoStreamIndex){
+
+                    // Convert ffmpeg frame timestamp to real frame number.
+                    int64_t numberFrame = (double)((int64_t)pts - 
+                        formatCtx->streams[videoStreamIndex]->start_time) * 
+                        videoBaseTime * videoFPS; 
+
+                    break;
+
+                } 
+            }
+        } 
+    }
+
+    return packet;
+
+}
