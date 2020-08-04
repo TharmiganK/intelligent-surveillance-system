@@ -35,12 +35,13 @@ class StreamReceiver {
 
     private:
 
-        AVFormatContext* formatCtx; /*!< RTSP stream format context information */
-        AVCodecContext* videoCodecCtx; /*!< Video codec context information */
-        int videoStreamIndex; /*!< The index of the video stream in the RTSP stream */
-        bool isOpen; /*!< Value to indicate whether the stream is opened or not */
-        double videoFPS; /*!< Frame per second of the video stream */
-        double videoBaseTime; /*!< Base time of the video stream */
+        AVFormatContext* formatCtx; /* RTSP stream format context information */
+        AVCodecContext* videoCodecCtx; /* Video codec context information */
+        int videoStreamIndex; /* The index of the video stream in the RTSP stream */
+        bool isOpen; /* Value to indicate whether the stream is opened or not */
+        double videoFPS; /* Frame per second of the video stream */
+        double videoBaseTime; /* Base time of the video stream */
+        std::string stream_url;
 
     public:
 
@@ -56,6 +57,15 @@ class StreamReceiver {
             videoStreamIndex(-1), 
             videoCodecCtx(NULL),
             formatCtx(NULL){;}
+
+        StreamReceiver(std::string& url):
+            videoBaseTime(0.0),  
+            videoFPS(0.0),  
+            isOpen(false),
+            videoStreamIndex(-1), 
+            videoCodecCtx(NULL),
+            formatCtx(NULL),
+            stream_url(url){;}
 
         /**
             @brief Destructor of class StreamReceiver.
@@ -97,8 +107,6 @@ class StreamReceiver {
         }
 
     public:
-        AVCodecContext *codec_ctx;
-        void setContext(AVCodecContext *codec_ctx);
         void operator()(PacketManager *packetManager, FrameManager *frameManager);
 
     private:
