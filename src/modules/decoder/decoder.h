@@ -30,13 +30,13 @@ class Decoder {
 
     private:
 
-        AVCodecContext *codec_ctx; /*!< Codec context information of the video codec */
-        struct SwsContext *imgCvtCtx; /*!< Image convert context information (YUV -> BGR) */
-        int width; /*!< Width of the decoded frame */
-        int height; /*!< Height of the decoded frame */
-        int bufferImgSize; /*!< Image buffer size from video codec */
-        uint8_t *buffer; /*!< Buffer image used for YUV to BGR conversion */
-        AVCodec* videoCodec; /*!< Video codec decoder */
+        AVCodecContext *codec_ctx; /* Codec context information of the video codec */
+        struct SwsContext *imgCvtCtx; /* Image convert context information (YUV -> BGR) */
+        int width; /* Width of the decoded frame */
+        int height; /* Height of the decoded frame */
+        int bufferImgSize; /* Image buffer size from video codec */
+        uint8_t *buffer; /* Buffer image used for YUV to BGR conversion */
+        AVCodec* videoCodec; /* Video codec decoder */
 
     public:
 
