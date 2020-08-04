@@ -14,7 +14,6 @@ void StreamReceiver::operator()(PacketManager *packetManager, FrameManager *fram
     av_init_packet(&packet);
 
     std::thread d1(Decoder(videoCodecCtx),frameManager,packetManager);
-    d1.join();
     
     int cnt = 0;
 
