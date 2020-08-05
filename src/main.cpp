@@ -48,6 +48,7 @@ int main() {
 	std::thread display1(display(), std::ref(videoStream1.frameQueue));
 
     BOOST_LOG_TRIVIAL(info) << "PROCESSING";
+    
     //Waiting until the processes are over
     streamReceiver1.join();
     decoder1.join();

@@ -54,9 +54,9 @@ void FrameQueue::enqueueFrame(cv::Mat newFrame) {
 cv::Mat FrameQueue::dequeueFrame() {
 
     std::lock_guard<std::mutex> guard(mutexForQueue);
-    cv::Mat frame = queue.front();
+    currentFrame = queue.front();
     queue.pop_front();
-    return frame;
+    return currentFrame;
 
 }
 

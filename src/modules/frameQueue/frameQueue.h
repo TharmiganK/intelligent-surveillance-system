@@ -26,6 +26,7 @@ class FrameQueue {
         boost::circular_buffer<cv::Mat> queue; /*!< A circular buffer queue to keep the incoming frames */
         int queueCapacity; /*!< Maximum number of frames that can be present inside the queue */
         std::mutex mutexForQueue; /*!< Mutex to give exclusive access to the queue */
+        cv::Mat currentFrame; /*!< Frame which is currently consumed from the queue to process */
 
     public:
 

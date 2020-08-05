@@ -6,6 +6,8 @@
 
 #include "display.h"
 
+#define MAX_NUM_FRAMES 1000
+
 /**
     @details This is a temprary function which runs as a seperate thread where it takes the 
     frames (if there is any) from the frame queue passed as argument and displays it. After displaying
@@ -16,7 +18,7 @@ void display::operator()(FrameQueue& frameQueue) {
     cv::Mat frameToDisplay;
     int count = 0;
 
-    while(count < 1000) {
+    while(count < MAX_NUM_FRAMES) {
 
         if (!frameQueue.queueIsEmpty()) {
 

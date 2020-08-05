@@ -54,9 +54,9 @@ void PacketQueue::enqueuePacket(AVPacket newPacket) {
 AVPacket PacketQueue::dequeuePacket() {
 
     std::lock_guard<std::mutex> guard(mutexForQueue);
-    AVPacket packet = queue.front();
+    AVPacket currentPacket = queue.front();
     queue.pop_front();
-    return packet;
+    return currentPacket;
 
 }
 

@@ -32,6 +32,8 @@ class PacketQueue {
         boost::circular_buffer<AVPacket> queue; /*!< A circular buffer queue to keep the incoming frames */
         int queueCapacity; /*!< Maximum number of frames that can be present inside the queue */
         std::mutex mutexForQueue; /*!< Mutex to give exclusive access to the queue */
+        AVPacket currentPacket; /*!< Packet which is currently consumed from the queue to decode */
+        
     public:
 
         /**

@@ -5,6 +5,7 @@
 */
 
 #include "decoder.h"
+
 #define MAX_NUM_FRAMES 1000
 
 /**
