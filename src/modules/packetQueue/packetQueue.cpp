@@ -1,46 +1,48 @@
 /**
     Intelligent Surveillance System
-    @file packetManager.cpp
+    @file packetQueue.cpp
     @author Lavinan Selvaratnam
 */
 
 /**
-    @todo Abstract as a generic queue manager class
+    @todo Abstract PacketQueue and FrameQueue as a generic queue class
     @todo unit test
 */
 
-#include "packetManager.h"
+#include "packetQueue.h"
 
 /**
-    @details Constructor of PacketManager to define the camera stream ID associated and to
-    define the maximum number of packets that should be allowed to be present in the queue.
+    @details Constructor of PacketQueue to define the camera stream ID associated and to
+    define the number of packets that should be allowed to be present in the queue.
     Memory for the queue is also allocated with a size of queueCapacity.
 */
-PacketManager::PacketManager(int streamID, int queueCapacity) {
+PacketQueue::PacketQueue(int streamID, int queueCapacity) :
 
-    this->streamID = streamID;
-    this->queueCapacity = queueCapacity;
-    packetQueue  = boost::circular_buffer<AVPacket>(queueCapacity);
+    streamID(streamID),
+    queueCapacity(queueCapacity),
+    queue(queueCapacity)
+    
+    {
 
-}
+    }
 
 /**
     @details Adds the packet passed as argument at the end of the frame queue.
     If the queue is full it drops a packet and then add the new one.
     @sa dropPacket()
 */
-void PacketManager::enqueuePacket(AVPacket newPacket) {
+void PacketQueue::enqueuePacket(AVPacket newPacket) {
 
-    if(PacketManager::queueLength() < PacketManager::queueCapacity) {
+    if(PacketQueue::queueLength() < PacketQueue::queueCapacity) {
 
         std::lock_guard<std::mutex> guard(mutexForQueue);
-        packetQueue.push_back(newPacket);
+        queue.push_back(newPacket);
 
     } else {
 
-        PacketManager::dropPacket();
+        PacketQueue::dropPacket();
         std::lock_guard<std::mutex> guard(mutexForQueue);
-        packetQueue.push_back(newPacket);
+        queue.push_back(newPacket);
         
     }
             
@@ -49,11 +51,11 @@ void PacketManager::enqueuePacket(AVPacket newPacket) {
 /**
     @details Takes the first packet out of the queue and returns it
 */
-AVPacket PacketManager::dequeuePacket() {
+AVPacket PacketQueue::dequeuePacket() {
 
     std::lock_guard<std::mutex> guard(mutexForQueue);
-    AVPacket packet = packetQueue.front();
-    packetQueue.pop_front();
+    AVPacket packet = queue.front();
+    queue.pop_front();
     return packet;
 
 }
@@ -61,20 +63,20 @@ AVPacket PacketManager::dequeuePacket() {
 /**
     @details Checks the number of packet currently present inside the queue
 */
-int PacketManager::queueLength() {
+int PacketQueue::queueLength() {
 
     std::lock_guard<std::mutex> guard(mutexForQueue);
-    return packetQueue.size();
+    return queue.size();
 
 }
 
 /**
     @details Checks whether there is any packet present inside the queue
 */
-bool PacketManager::queueIsEmpty() {
+bool PacketQueue::queueIsEmpty() {
 
     std::lock_guard<std::mutex> guard(mutexForQueue);
-    return packetQueue.empty();
+    return queue.empty();
 
 }
 
@@ -84,10 +86,10 @@ bool PacketManager::queueIsEmpty() {
     @sa enqueuePacket()
     @todo change the logic to drop a frame based on difference
 */
-void PacketManager::dropPacket() {
+void PacketQueue::dropPacket() {
 
     std::lock_guard<std::mutex> guard(mutexForQueue);
-    packetQueue.pop_front();
+    queue.pop_front();
     BOOST_LOG_TRIVIAL(info) << "Packet queue is full. One packet dropped";
 
 }

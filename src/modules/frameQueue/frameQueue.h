@@ -1,11 +1,11 @@
 /**
     Intelligent Surveillance System
-    @file frameManager.h
+    @file frameQueue.h
     @author Lavinan Selvaratnam
 */
 
-#ifndef _FRAMEMANAGER_H
-#define _FRAMEMANAGER_H
+#ifndef _FRAMEQUEUE_H
+#define _FRAMEQUEUE_H
 #include <opencv2/opencv.hpp>
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
@@ -15,26 +15,26 @@
 
 /**
     @class Class to manage the frame queue
-    @details FrameManager has a thread safety queue to store the decoded frames temporarily until
+    @details FrameQueue has a thread safety queue to store the decoded frames temporarily until
     it is accessed. When queue is full it drops the first frame before adding a new one.
 */
-class FrameManager {
+class FrameQueue {
 
     private:
 
         int streamID; /*!< ID of the associated video stream */
-        boost::circular_buffer<cv::Mat> frameQueue; /*!< A circular buffer queue to keep the incoming frames */
+        boost::circular_buffer<cv::Mat> queue; /*!< A circular buffer queue to keep the incoming frames */
         int queueCapacity; /*!< Maximum number of frames that can be present inside the queue */
         std::mutex mutexForQueue; /*!< Mutex to give exclusive access to the queue */
 
     public:
 
         /**
-            @brief Constructor of class FrameManager.
+            @brief Constructor of class FrameQueue.
             @param streamID ID of the associated camera stream.
-            @param queueCapacity maximum number of frames that can exist in the queue.
+            @param queueCapacity Number of frames that can exist in the queue.
         */
-        FrameManager(int streamID, int queueCapacity);
+        FrameQueue(int streamID, int queueCapacity);
 
         /**
             @brief To add a frame at the end of queue.

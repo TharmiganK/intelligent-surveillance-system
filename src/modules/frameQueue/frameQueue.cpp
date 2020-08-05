@@ -1,46 +1,48 @@
 /**
     Intelligent Surveillance System
-    @file frameManager.cpp
+    @file frameQueue.cpp
     @author Lavinan Selvaratnam
 */
 
 /**
-    @todo Abstract as a generic queue manager class
+    @todo Abstract PacketQueue and FrameQueue as a generic queue class
     @todo unit test
 */
 
-#include "frameManager.h"
+#include "frameQueue.h"
 
 /**
-    @details Constructor of FrameManager to define the camera stream ID associated and to
-    define the maximum number of frames that should be allowed to be present in the queue.
+    @details Constructor of FrameQueue to define the camera stream ID associated and to
+    define the number of frames that should be allowed to be present in the queue.
     Memory for the queue is also allocated with a size of queueCapacity.
 */
-FrameManager::FrameManager(int streamID, int queueCapacity) {
+FrameQueue::FrameQueue(int streamID, int queueCapacity) :
 
-    this->streamID = streamID;
-    this->queueCapacity = queueCapacity;
-    frameQueue = boost::circular_buffer<cv::Mat>(queueCapacity);
+    streamID(streamID),
+    queueCapacity(queueCapacity),
+    queue(queueCapacity)
 
-}
+    {
+
+    }
 
 /**
     @details Adds the frame passed as argument at the end of the frame queue.
     If the queue is full it drops a frame and then add the new one.
     @sa dropFrame()
 */
-void FrameManager::enqueueFrame(cv::Mat newFrame) {
+void FrameQueue::enqueueFrame(cv::Mat newFrame) {
 
-    if(FrameManager::queueLength() < FrameManager::queueCapacity) {
+    if(FrameQueue::queueLength() < FrameQueue::queueCapacity) {
 
         std::lock_guard<std::mutex> guard(mutexForQueue);
-        frameQueue.push_back(newFrame);
+        queue.push_back(newFrame);
 
     } else {
 
-        FrameManager::dropFrame();
+        FrameQueue::dropFrame();
         std::lock_guard<std::mutex> guard(mutexForQueue);
-        frameQueue.push_back(newFrame);
+        queue.push_back(newFrame);
 
     }
             
@@ -49,11 +51,11 @@ void FrameManager::enqueueFrame(cv::Mat newFrame) {
 /**
     @details Takes the first frame out of the queue and returns it
 */
-cv::Mat FrameManager::dequeueFrame() {
+cv::Mat FrameQueue::dequeueFrame() {
 
     std::lock_guard<std::mutex> guard(mutexForQueue);
-    cv::Mat frame = frameQueue.front();
-    frameQueue.pop_front();
+    cv::Mat frame = queue.front();
+    queue.pop_front();
     return frame;
 
 }
@@ -61,20 +63,20 @@ cv::Mat FrameManager::dequeueFrame() {
 /**
     @details Checks the number of frames currently present inside the queue
 */
-int FrameManager::queueLength() {
+int FrameQueue::queueLength() {
 
     std::lock_guard<std::mutex> guard(mutexForQueue);
-    return frameQueue.size();
+    return queue.size();
 
 }
 
 /**
     @details Checks whether there is any frame present inside the queue
 */
-bool FrameManager::queueIsEmpty() {
+bool FrameQueue::queueIsEmpty() {
 
     std::lock_guard<std::mutex> guard(mutexForQueue);
-    return frameQueue.empty();
+    return queue.empty();
 
 }
 
@@ -84,10 +86,10 @@ bool FrameManager::queueIsEmpty() {
     @sa enqueueFrame()
     @todo change the logic to drop a frame based on difference
 */
-void FrameManager::dropFrame() {
+void FrameQueue::dropFrame() {
 
     std::lock_guard<std::mutex> guard(mutexForQueue);
-    frameQueue.pop_front();
+    queue.pop_front();
     BOOST_LOG_TRIVIAL(info) << "Frame queue is full. One frame dropped";
 
 }
