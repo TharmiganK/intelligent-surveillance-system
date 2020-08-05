@@ -5,7 +5,14 @@
 */
 
 #include "decoder.h"
+#define MAX_NUM_FRAMES 1000
 
+/**
+    @details operator method accepts the initiated video stream
+    object and continues to decode packets from the stream and 
+    enque the decoded frames in frame queue.
+    This method is used to run in threads.
+*/
 void Decoder::operator()(VideoStream& videoStream) {
 
     AVPacket packet;
@@ -15,7 +22,7 @@ void Decoder::operator()(VideoStream& videoStream) {
     cv::Mat image;
     int count = 0;
 
-    while (count < 1000){
+    while (count < MAX_NUM_FRAMES){
 
         if (!videoStream.packetQueue.queueIsEmpty()){
 
