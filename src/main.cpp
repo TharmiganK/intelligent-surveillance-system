@@ -1,3 +1,3 @@
 int main() {
-    //Main method
+    //Main function
 }
