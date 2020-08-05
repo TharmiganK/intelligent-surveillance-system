@@ -21,9 +21,9 @@
 #include "modules/packetQueue/packetQueue.h"
 #include "modules/videoStream/videoStream.h"
 
-#define streamURL "rtsp://admin:admin@192.168.1.3:8554/live"
-#define queueCapacity 30
-#define streamID 1
+#define STREAM_URL "rtsp://admin:admin@192.168.1.3:8554/live"
+#define QUEUE_CAPACITY 30
+#define STREAM_ID 1
 
 /**
     @brief Main function
@@ -37,7 +37,7 @@ int main() {
 
     BOOST_LOG_TRIVIAL(info) << "STARTING";
     //Creating a sample VideoStream instance.
-    VideoStream videoStream1(streamID, streamURL, queueCapacity);
+    VideoStream videoStream1(STREAM_ID, STREAM_URL, QUEUE_CAPACITY);
     videoStream1.OpenStream();
 
     BOOST_LOG_TRIVIAL(info) << "INITIALIZING";
