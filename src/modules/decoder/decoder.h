@@ -51,6 +51,10 @@ class Decoder {
         */
         cv::Mat GetImage(VideoStream& videoStream, AVFrame *frameBGR);
 
+        /**
+            @brief Method to run in Multi-thread.
+            @param videoStream RTSP video stream;
+        */
         void operator()(VideoStream& videoStream);
 
 };
