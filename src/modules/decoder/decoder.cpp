@@ -6,29 +6,35 @@
 
 #include "decoder.h"
 
-void Decoder::operator()(FrameManager *frameManager, PacketManager *packetManager) {
+void Decoder::operator()(VideoStream& videoStream) {
 
     AVPacket packet;
     av_init_packet(&packet);
     AVFrame *frameYUV;
     AVFrame *frameBGR;
     cv::Mat image;
+    int count = 0;
 
-    while (true){
+    while (count < 1000){
 
-        if (!packetManager->queueIsEmpty()){
+        if (!videoStream.packetQueue.queueIsEmpty()){
 
-            packet = packetManager->dequeuePacket();
+            packet = videoStream.packetQueue.dequeuePacket();
 
             if (&packet){
 
-                frameYUV = DecodeVideo(&packet);
-                frameBGR = GetBGRFrame(frameYUV);
+                frameYUV = DecodeVideo(videoStream, &packet);
+                frameBGR = GetBGRFrame(videoStream, frameYUV);
 
                 if(frameBGR){
-                    image = GetImage(frameBGR);
-                    frameManager->enqueueFrame(image.clone());
+
+                    image = GetImage(videoStream, frameBGR);
+                    videoStream.frameQueue.enqueueFrame(image.clone());
+
                 }
+
+                count++;
+                BOOST_LOG_TRIVIAL(info) << "Decoded frame : " << count << " from stream ID : " << videoStream.streamID;
 
             }
 
@@ -42,16 +48,16 @@ void Decoder::operator()(FrameManager *frameManager, PacketManager *packetManage
     @details DecodeVideo method accepts the video packets from stream and decode
     it to a YUV video frame.
 */
-AVFrame* Decoder::DecodeVideo(const AVPacket* avpkt){
+AVFrame* Decoder::DecodeVideo(VideoStream& videoStream, const AVPacket* avpkt){
 
     AVFrame *outFrameYUV = av_frame_alloc();
 
-    if (codec_ctx){
+    if (videoStream.videoCodecCtx){
 
         if (avpkt && outFrameYUV){
 
             int got_picture_ptr = 0;
-            int videoFrameBytes = avcodec_decode_video2(codec_ctx, outFrameYUV, &got_picture_ptr, avpkt);
+            int videoFrameBytes = avcodec_decode_video2(videoStream.videoCodecCtx, outFrameYUV, &got_picture_ptr, avpkt);
 
         }
     }
@@ -64,16 +70,16 @@ AVFrame* Decoder::DecodeVideo(const AVPacket* avpkt){
     @details GetBGRFrame method accepts the YUV formatted decoded video frame and 
     converts it to a BGR formatted video frame.
 */
-AVFrame* Decoder::GetBGRFrame(AVFrame *frameYUV){
+AVFrame* Decoder::GetBGRFrame(VideoStream& videoStream, AVFrame *frameYUV){
 
     AVFrame * frame = NULL;
     frame = av_frame_alloc();
     
     if (frame){
 
-        avpicture_fill((AVPicture*) frame, buffer, AV_PIX_FMT_BGR24, width, height);
+        avpicture_fill((AVPicture*) frame, videoStream.buffer, AV_PIX_FMT_BGR24, videoStream.width, videoStream.height);
 
-        sws_scale(imgCvtCtx, frameYUV->data, frameYUV->linesize, 0, height, frame->data, frame->linesize);
+        sws_scale(videoStream.imgCvtCtx, frameYUV->data, frameYUV->linesize, 0, videoStream.height, frame->data, frame->linesize);
         
     }
 
@@ -85,9 +91,9 @@ AVFrame* Decoder::GetBGRFrame(AVFrame *frameYUV){
     @details GetImage method accepts the BGR formatted video frame and converts
     it to a OpenCV Mat image.
 */
-cv::Mat Decoder::GetImage(AVFrame *frameBGR){
+cv::Mat Decoder::GetImage(VideoStream& videoStream, AVFrame *frameBGR){
 
-    cv::Mat image(codec_ctx->height, codec_ctx->width, CV_8UC3, frameBGR->data[0], frameBGR->linesize[0]);
+    cv::Mat image(videoStream.height, videoStream.width, CV_8UC3, frameBGR->data[0], frameBGR->linesize[0]);
 
     return image;
 
