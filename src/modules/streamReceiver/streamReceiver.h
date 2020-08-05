@@ -7,14 +7,10 @@
 #ifndef _STREAMRECEIVER_H
 #define _STREAMRECEIVER_H
 
-#include "../frameManager/frameManager.h"
-#include "../packetManager/packetManager.h"
-#include "../decoder/decoder.h"
+#include "../frameQueue/frameQueue.h"
+#include "../packetQueue/packetQueue.h"
+#include "../videoStream/videoStream.h"
 #include <fstream>
-#include <thread>
-#include <X11/Xlib.h>
-#include <deque>
-
 extern "C" {
 #include <libavcodec/avcodec.h>
 #include <libavformat/avformat.h>
@@ -33,94 +29,17 @@ using namespace std;
 */
 class StreamReceiver {
 
-    private:
-
-        AVFormatContext* formatCtx; /* RTSP stream format context information */
-        AVCodecContext* videoCodecCtx; /* Video codec context information */
-        int videoStreamIndex; /* The index of the video stream in the RTSP stream */
-        bool isOpen; /* Value to indicate whether the stream is opened or not */
-        double videoFPS; /* Frame per second of the video stream */
-        double videoBaseTime; /* Base time of the video stream */
-        std::string stream_url;
-
     public:
-
-        /**
-            @brief Constructor of class StreamReceiver.
-            @details Constructor of StreamRecevier initiates the attributes with
-            the following default values.
-        */
-        StreamReceiver() :
-            videoBaseTime(0.0),  
-            videoFPS(0.0),  
-            isOpen(false),
-            videoStreamIndex(-1), 
-            videoCodecCtx(NULL),
-            formatCtx(NULL){;}
-
-        StreamReceiver(std::string& url):
-            videoBaseTime(0.0),  
-            videoFPS(0.0),  
-            isOpen(false),
-            videoStreamIndex(-1), 
-            videoCodecCtx(NULL),
-            formatCtx(NULL),
-            stream_url(url){;}
-
-        /**
-            @brief Destructor of class StreamReceiver.
-        */
-        virtual ~StreamReceiver() {
-
-            CloseStream();
-
-        }
-
-        /**
-            @brief Open the RTSP stream.
-            @param inputStream RTSP stream URL.
-            @return true if RTSP stream is opened sucessfully; false otherwise.
-        */
-        virtual bool OpenStream(std::string& inputStream);
-
-        /**
-            @brief Close the RTSP stream.
-            @return true if RTSP stream is closed sucessfully; false otherwise.
-        */
-        virtual bool CloseStream();
 
         /**
             @brief Get the next video packet from video stream.
             @return Video packet from the stream;
         */
-        virtual AVPacket GetVideoPacket();
-
-
-        /**
-            @brief Get the video codec information.
-            @return The video codec context information from the stream.
-        */
-        AVCodecContext* GetVideoCodecInfo(){
-
-            return videoCodecCtx;
-
-        }
+        virtual AVPacket GetVideoPacket(VideoStream& videoStream);
 
     public:
-        void operator()(PacketManager *packetManager, FrameManager *frameManager);
+        void operator()(VideoStream& videoStream);
 
-    private:
-
-        /**
-            @brief Open the video stream from RTSP stream.
-            @return true if video stream is opened sucessfully; false otherwise.
-        */
-        bool OpenVideoStream();
-
-        /**
-            @brief Close the video stream from RTSP stream.
-        */
-        void CloseVideoStream();
 };
 
 #endif
