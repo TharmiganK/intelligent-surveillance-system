@@ -5,14 +5,21 @@
 */
 
 #include "streamReceiver.h"
+#define MAX_NUM_PACKETS 1000
 
+/**
+    @details operator method accepts the initiated video stream
+    object and continues to read packets from the stream and 
+    enque them in packet queue.
+    This method is used to run in threads.
+*/
 void StreamReceiver::operator()(VideoStream& videoStream) {
 
     AVPacket packet;
     av_init_packet(&packet);
     int count = 0;
 
-    while (count < 1000){
+    while (count < MAX_NUM_PACKETS ){
 
         packet = GetVideoPacket(videoStream);
 
@@ -29,11 +36,6 @@ void StreamReceiver::operator()(VideoStream& videoStream) {
 
 }
 
-/**
-    @details OpenStream method opens the RTSP stream by accepting the RTSP
-    URL and configuresfps and basetime in addition to format context of 
-    the stream.
-*/
 
 /**
     @details GetVideoPacket method returns the video packets from the
