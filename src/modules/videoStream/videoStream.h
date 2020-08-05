@@ -42,6 +42,15 @@ struct VideoStream {
     VideoStream(int streamID, const char *streamURL, int queueCapacity);
 
     /**
+        @brief Destructor of class StreamReceiver.
+    */
+    virtual ~VideoStream() {
+
+            CloseStream();
+
+    }
+
+    /**
         @brief Open the RTSP stream.
         @return true if RTSP stream is opened sucessfully; false otherwise.
     */
