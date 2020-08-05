@@ -38,6 +38,10 @@ class StreamReceiver {
         virtual AVPacket GetVideoPacket(VideoStream& videoStream);
 
     public:
+        /**
+            @brief Method to run in Multi-thread.
+            @param videoStream RTSP video stream;
+        */
         void operator()(VideoStream& videoStream);
 
 };
