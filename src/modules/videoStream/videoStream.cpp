@@ -152,7 +152,7 @@ bool VideoStream::OpenVideoStream(){
                 videoStreamIndex = i;
                 videoCodecCtx = formatCtx->streams[i]->codec;
                 res = true;
-                BOOST_LOG_TRIVIAL(info) << "VIDEO STREAM IS FOUNDED WITH CODEC : " << videoCodecCtx->codec->name << ".";
+                BOOST_LOG_TRIVIAL(info) << "VIDEO STREAM IS FOUNDED.";
 
                 break;
 
