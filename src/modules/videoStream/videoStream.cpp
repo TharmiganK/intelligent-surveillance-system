@@ -122,12 +122,11 @@ bool VideoStream::CloseStream(){
 
     if (formatCtx){
 
+        BOOST_LOG_TRIVIAL(info) << "RTSP STREAM IS CLOSED SUCCESSFULLY.";
         avformat_close_input(&formatCtx);
         formatCtx = NULL;
 
     }
-
-    BOOST_LOG_TRIVIAL(info) << "RTSP STREAM IS CLOSED SUCCESSFULLY.";
 
     return true;
 
