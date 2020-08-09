@@ -43,6 +43,7 @@ bool VideoStream::OpenStream(){
     // Open media stream.
     if (avformat_open_input(&formatCtx, streamURL, NULL, NULL) != 0){
 
+        BOOST_LOG_TRIVIAL(error) << "COULD NOT OPEN THE RTSP STREAM.";
         CloseStream();
         return false;
 
@@ -51,6 +52,7 @@ bool VideoStream::OpenStream(){
     // Get format info.
     if (avformat_find_stream_info(formatCtx, NULL) < 0){
 
+        BOOST_LOG_TRIVIAL(error) << "COULD NOT FIND THE STREM INFO.";
         CloseStream();
         return false;
 
@@ -61,6 +63,7 @@ bool VideoStream::OpenStream(){
 
     if (!hasVideo){
 
+        BOOST_LOG_TRIVIAL(error) << "COULD NOT FIND A VIDEO STREAM.";
         CloseStream();
         return false;
 
@@ -90,11 +93,18 @@ bool VideoStream::OpenStream(){
 
     videoCodec = avcodec_find_decoder(videoCodecCtx->codec_id);
 
-    if (videoCodec)
-    {
+    if (videoCodec){
+
         avcodec_open2(videoCodecCtx, videoCodec, NULL);
+
+    }else{
+
+        BOOST_LOG_TRIVIAL(error) << "COULD NOT FIND THE SUITABLE DECODER.";
+        return false;
+
     }
 
+    BOOST_LOG_TRIVIAL(info) << "RTSP STREAM IS OPENED SUCCESSFULLY.";
     return true;
 
 }
@@ -116,6 +126,8 @@ bool VideoStream::CloseStream(){
         formatCtx = NULL;
 
     }
+
+    BOOST_LOG_TRIVIAL(info) << "RTSP STREAM IS CLOSED SUCCESSFULLY.";
 
     return true;
 
@@ -141,6 +153,7 @@ bool VideoStream::OpenVideoStream(){
                 videoStreamIndex = i;
                 videoCodecCtx = formatCtx->streams[i]->codec;
                 res = true;
+                BOOST_LOG_TRIVIAL(info) << "VIDEO STREAM IS FOUNDED WITH CODEC : " << videoCodecCtx->codec->name << ".";
 
                 break;
 
@@ -159,6 +172,8 @@ bool VideoStream::OpenVideoStream(){
 void VideoStream::CloseVideoStream(){
 
     if (videoCodecCtx){
+
+        BOOST_LOG_TRIVIAL(info) << "VIDEO CODEC IS CLOSED SUCCESSFULLY.";
 
         avcodec_close(videoCodecCtx);
         videoCodecCtx = NULL;
