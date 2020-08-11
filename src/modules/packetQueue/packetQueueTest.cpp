@@ -4,10 +4,9 @@
     @author Lavinan Selvaratnam
 */
 
-#define BOOST_TEST_DYN_LINK
-#define BOOST_TEST_MODULE Suites
-#include <boost/test/unit_test.hpp>
 #define private public
+
+#include <boost/test/unit_test.hpp>
 #include "../packetQueue/packetQueue.h"
  
 BOOST_AUTO_TEST_SUITE(packetQueue)
@@ -65,19 +64,6 @@ BOOST_AUTO_TEST_CASE(dropPacket) {
     BOOST_CHECK(packetQueue1.dropPacket());
     BOOST_CHECK(!packetQueue1.dropPacket());
 
-}
- 
-BOOST_AUTO_TEST_SUITE_END()
- 
-BOOST_AUTO_TEST_SUITE(Physics)
- 
-BOOST_AUTO_TEST_CASE(specialTheory)
-{
-    int e = 32;
-    int m = 2;
-    int c = 4;
- 
-    BOOST_CHECK(e == m * c * c);
 }
  
 BOOST_AUTO_TEST_SUITE_END()
