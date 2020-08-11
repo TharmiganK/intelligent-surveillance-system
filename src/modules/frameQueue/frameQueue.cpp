@@ -31,7 +31,7 @@ FrameQueue::FrameQueue(int streamID, int queueCapacity) :
     If the queue is full it drops a frame and then add the new one.
     @sa dropFrame()
 */
-void FrameQueue::enqueueFrame(cv::Mat newFrame) {
+bool FrameQueue::enqueueFrame(cv::Mat newFrame) {
 
     if(FrameQueue::queueLength() < FrameQueue::queueCapacity) {
 
@@ -40,11 +40,21 @@ void FrameQueue::enqueueFrame(cv::Mat newFrame) {
 
     } else {
 
-        FrameQueue::dropFrame();
-        std::lock_guard<std::mutex> guard(mutexForQueue);
-        queue.push_back(newFrame);
+        if (FrameQueue::dropFrame()) {
+
+            std::lock_guard<std::mutex> guard(mutexForQueue);
+            queue.push_back(newFrame);
+
+        } else {
+
+            BOOST_LOG_TRIVIAL(error) << "Frame queue doesn't have space";
+            return false;
+
+        }
 
     }
+
+    return true;
             
 }
 
@@ -86,10 +96,18 @@ bool FrameQueue::queueIsEmpty() {
     @sa enqueueFrame()
     @todo change the logic to drop a frame based on difference
 */
-void FrameQueue::dropFrame() {
+bool FrameQueue::dropFrame() {
 
-    std::lock_guard<std::mutex> guard(mutexForQueue);
-    queue.pop_front();
-    BOOST_LOG_TRIVIAL(info) << "Frame queue is full. One frame dropped";
+    if(!queueIsEmpty()) {
+
+        std::lock_guard<std::mutex> guard(mutexForQueue);
+        queue.pop_front();
+        BOOST_LOG_TRIVIAL(info) << "A frame is dropped";
+
+        return true;
+
+    }
+
+    return false;
 
 }
