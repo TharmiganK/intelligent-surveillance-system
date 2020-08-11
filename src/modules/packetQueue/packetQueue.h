@@ -47,7 +47,7 @@ class PacketQueue {
             @brief To add a packet at the end of queue.
             @param newFrame The packet that should be added.
         */
-        void enqueuePacket(AVPacket newPacket);
+        bool enqueuePacket(AVPacket newPacket);
 
 
         /**
@@ -73,7 +73,7 @@ class PacketQueue {
         /**
             @brief Drop the first packet in the queue
         */
-        void dropPacket();
+        bool dropPacket();
 
 };
 
