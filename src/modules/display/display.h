@@ -4,7 +4,7 @@
     @author Lavinan Selvaratnam
 */
 
-#include "../frameManager/frameManager.h"
+#include "../frameQueue/frameQueue.h"
 
 /**
     @class Class to take frames from frame queue and display them.
@@ -17,8 +17,8 @@ class display {
 
         /**
             @brief Member function to run as a seperate thread and display the frames.
-            @param m1 pointer to the frame queue from which frames should be taken.
+            @param frameQueue reference to the frame queue from which frames should be taken.
         */
-        void operator()(FrameManager *frameManager);
+        void operator()(FrameQueue& frameQueue);
         
 };

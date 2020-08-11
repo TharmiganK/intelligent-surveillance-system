@@ -1,12 +1,16 @@
-//This is a mock stream receiver
+/**
+    Intelligent Surveillance System
+    @file streamReceiver.h
+    @author Tharmigan Krishnananthalingam
+*/
 
-#include "../frameManager/frameManager.h"
-#include "../packetManager/packetManager.h"
-#include "../decoder/decoder.h"
+#ifndef _STREAMRECEIVER_H
+#define _STREAMRECEIVER_H
+
+#include "../frameQueue/frameQueue.h"
+#include "../packetQueue/packetQueue.h"
+#include "../videoStream/videoStream.h"
 #include <fstream>
-#include <thread>
-#include <X11/Xlib.h>
-#include <deque>
 extern "C" {
 #include <libavcodec/avcodec.h>
 #include <libavformat/avformat.h>
@@ -14,9 +18,32 @@ extern "C" {
 #include <libswscale/swscale.h>
 }
 
+using namespace std;
+
+/**
+    @class Class to receive the video packets from RTSP stream.
+    @details StreamReceiver contains AVFormat context information about the 
+    RTSP stream and video codec information from the stream. It can return
+    video packets from stream and can share the codec information with the
+    decoder.
+*/
 class StreamReceiver {
+
     public:
-        AVCodecContext *codec_ctx;
-        void setContext(AVCodecContext *codec_ctx);
-        void operator()(PacketManager *packetManager, FrameManager *frameManager);
+
+        /**
+            @brief Get the next video packet from video stream.
+            @return Video packet from the stream;
+        */
+        virtual AVPacket GetVideoPacket(VideoStream& videoStream);
+
+    public:
+        /**
+            @brief Method to run in Multi-thread.
+            @param videoStream RTSP video stream;
+        */
+        void operator()(VideoStream& videoStream);
+
 };
+
+#endif

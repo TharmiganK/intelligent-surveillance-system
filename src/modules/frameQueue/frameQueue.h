@@ -1,39 +1,41 @@
 /**
     Intelligent Surveillance System
-    @file frameManager.h
+    @file frameQueue.h
     @author Lavinan Selvaratnam
 */
 
-#ifndef _FRAMEMANAGER_H
-#define _FRAMEMANAGER_H
+#ifndef _FRAMEQUEUE_H
+#define _FRAMEQUEUE_H
 #include <opencv2/opencv.hpp>
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <boost/log/trivial.hpp>
-#include <deque>
+#include <boost/circular_buffer.hpp>
 #include <mutex>
 
 /**
     @class Class to manage the frame queue
-    @details FrameManager has a queue to store the decoded frames temporarily until
+    @details FrameQueue has a thread safety queue to store the decoded frames temporarily until
     it is accessed. When queue is full it drops the first frame before adding a new one.
 */
-class FrameManager {
+class FrameQueue {
 
     private:
 
         int streamID; /*!< ID of the associated video stream */
-        std::deque<cv::Mat>frameQueue; /*!< Queue to keep the incoming frames */
-        int maxQueueLength; /*!< Maximum number of frames that can be present inside the queue */
+        boost::circular_buffer<cv::Mat> queue; /*!< A circular buffer queue to keep the incoming frames */
+        int queueCapacity; /*!< Maximum number of frames that can be present inside the queue */
+        std::mutex mutexForQueue; /*!< Mutex to give exclusive access to the queue */
+        cv::Mat currentFrame; /*!< Frame which is currently consumed from the queue to process */
 
     public:
 
         /**
-            @brief Constructor of class FrameManager.
+            @brief Constructor of class FrameQueue.
             @param streamID ID of the associated camera stream.
-            @param maxQueueLength maximum number of frames that can exist in the queue.
+            @param queueCapacity Number of frames that can exist in the queue.
         */
-        FrameManager(int streamID, int maxQueueLength);
+        FrameQueue(int streamID, int queueCapacity);
 
         /**
             @brief To add a frame at the end of queue.

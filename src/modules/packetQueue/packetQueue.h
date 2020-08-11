@@ -1,16 +1,16 @@
 /**
     Intelligent Surveillance System
-    @file packetManager.h
+    @file packetQueue.h
     @author Lavinan Selvaratnam
 */
 
-#ifndef _PACKETMANAGER_H
-#define _PACKETMANAGER_H
+#ifndef _PACKETQUEUE_H
+#define _PACKETQUEUE_H
 #include <opencv2/opencv.hpp>
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <boost/log/trivial.hpp>
-#include <deque>
+#include <boost/circular_buffer.hpp>
 #include <mutex>
 extern "C" {
 #include <libavcodec/avcodec.h>
@@ -21,25 +21,27 @@ extern "C" {
 
 /**
     @class Class to manage the packet queue which contains packets which are the compressed frames
-    @details PacketManager has a queue to store the packets temporarily until
+    @details PacketQueue has a thread safety queue to store the packets temporarily until
     it is accessed. When queue is full it drops the first packet before adding a new one.
 */
-class PacketManager {
+class PacketQueue {
 
     private:
 
         int streamID; /*!< ID of the associated video stream */
-        std::deque<AVPacket> packetQueue; /*!< Queue to keep the incoming frames */
-        int maxQueueLength; /*!< Maximum number of frames that can be present inside the queue */
-
+        boost::circular_buffer<AVPacket> queue; /*!< A circular buffer queue to keep the incoming frames */
+        int queueCapacity; /*!< Maximum number of frames that can be present inside the queue */
+        std::mutex mutexForQueue; /*!< Mutex to give exclusive access to the queue */
+        AVPacket currentPacket; /*!< Packet which is currently consumed from the queue to decode */
+        
     public:
 
         /**
-            @brief Constructor of class PacketManager.
+            @brief Constructor of class PacketQueue.
             @param streamID ID of the associated camera stream.
-            @param maxQueueLength maximum number of packets that can exist in the queue.
+            @param queueCapacity Number of packets that can exist in the queue.
         */
-        PacketManager(int streamID, int maxQueueLength);
+        PacketQueue(int streamID, int queueCapacity);
 
         /**
             @brief To add a packet at the end of queue.
