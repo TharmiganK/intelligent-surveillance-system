@@ -18,8 +18,6 @@ extern "C" {
 #include <libswscale/swscale.h>
 }
 
-using namespace std;
-
 /**
     @class Class to receive the video packets from RTSP stream.
     @details StreamReceiver contains AVFormat context information about the 

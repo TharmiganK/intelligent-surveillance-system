@@ -43,6 +43,7 @@ bool VideoStream::OpenStream(){
     // Open media stream.
     if (avformat_open_input(&formatCtx, streamURL, NULL, NULL) != 0){
 
+        BOOST_LOG_TRIVIAL(error) << "COULD NOT OPEN THE RTSP STREAM.";
         CloseStream();
         return false;
 
@@ -51,6 +52,7 @@ bool VideoStream::OpenStream(){
     // Get format info.
     if (avformat_find_stream_info(formatCtx, NULL) < 0){
 
+        BOOST_LOG_TRIVIAL(error) << "COULD NOT FIND THE STREM INFO.";
         CloseStream();
         return false;
 
@@ -61,6 +63,7 @@ bool VideoStream::OpenStream(){
 
     if (!hasVideo){
 
+        BOOST_LOG_TRIVIAL(error) << "COULD NOT FIND A VIDEO STREAM.";
         CloseStream();
         return false;
 
@@ -88,13 +91,31 @@ bool VideoStream::OpenStream(){
                                 videoCodecCtx->width, videoCodecCtx->height, AV_PIX_FMT_BGR24,
                                 SWS_BICUBIC, NULL, NULL, NULL);
 
+    // Video Codec from video stream
     videoCodec = avcodec_find_decoder(videoCodecCtx->codec_id);
 
-    if (videoCodec)
-    {
+    /** Uncomment this to create decoder using NVIDIA Codec with GPU
+     *  Acceleration
+     **/
+    // videoCodec = avcodec_find_decoder_by_name("h264_cuvid");
+    // AVCodecContext* codecCtx = avcodec_alloc_context3(videoCodec);
+
+    // avcodec_get_context_defaults3(codecCtx, videoCodec);
+    // avcodec_copy_context(codecCtx, videoCodecCtx);
+
+    if (videoCodec){
+
         avcodec_open2(videoCodecCtx, videoCodec, NULL);
+        // avcodec_open2(codecCtx, videoCodec, NULL);
+
+    }else{
+
+        BOOST_LOG_TRIVIAL(error) << "COULD NOT FIND THE SUITABLE DECODER.";
+        return false;
+
     }
 
+    BOOST_LOG_TRIVIAL(info) << "RTSP STREAM IS OPENED SUCCESSFULLY.";
     return true;
 
 }
@@ -112,6 +133,7 @@ bool VideoStream::CloseStream(){
 
     if (formatCtx){
 
+        BOOST_LOG_TRIVIAL(info) << "RTSP STREAM IS CLOSED SUCCESSFULLY.";
         avformat_close_input(&formatCtx);
         formatCtx = NULL;
 
@@ -141,6 +163,7 @@ bool VideoStream::OpenVideoStream(){
                 videoStreamIndex = i;
                 videoCodecCtx = formatCtx->streams[i]->codec;
                 res = true;
+                BOOST_LOG_TRIVIAL(info) << "VIDEO STREAM IS FOUNDED.";
 
                 break;
 
@@ -159,6 +182,8 @@ bool VideoStream::OpenVideoStream(){
 void VideoStream::CloseVideoStream(){
 
     if (videoCodecCtx){
+
+        BOOST_LOG_TRIVIAL(info) << "VIDEO CODEC IS CLOSED SUCCESSFULLY.";
 
         avcodec_close(videoCodecCtx);
         videoCodecCtx = NULL;

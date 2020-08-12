@@ -18,8 +18,6 @@ extern "C" {
 #include <libswscale/swscale.h>
 }
 
-using namespace std;
-
 /**
     @class Class to decode video packets
     @details Decoder contains a video codec to decode AVPackets to AVFrames.
