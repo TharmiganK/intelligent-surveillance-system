@@ -172,7 +172,7 @@ void Streamer::operator()(FrameQueue& frameQueue) {
 	
 	int count = 0;
 
-	int camID = 0, fps = 15, width = 1920, height = 1080, bitrate = 600000;
+	int camID = 0, fps = 25, width = 640, height = 480, bitrate = 1200000;
 	std::string codec_profile = "high444";
 	std::string server = "rtmp://localhost/live/stream";
 	//std::string outputServer = "rtsp://localhost/mystream";
@@ -180,7 +180,7 @@ void Streamer::operator()(FrameQueue& frameQueue) {
 
 	if (dump_log)
 	{
-		av_log_set_level(AV_LOG_DEBUG);
+		// av_log_set_level(AV_LOG_DEBUG);
 	}
 
 
@@ -213,7 +213,7 @@ void Streamer::operator()(FrameQueue& frameQueue) {
 	out_stream->codecpar->extradata_size = out_codec_ctx->extradata_size;
 
 	av_dump_format(ofmt_ctx, 0, output, 1);
-	//auto *swsctx = initialize_sample_scaler(out_codec_ctx, width, height);
+	auto *swsctx = initialize_sample_scaler(out_codec_ctx, width, height);
 	AVFrame *frame = allocate_frame_buffer(out_codec_ctx, width, height);
 	//cv::namedWindow("Live", cv::WINDOW_NORMAL);
 	int cur_size;
@@ -249,7 +249,7 @@ void Streamer::operator()(FrameQueue& frameQueue) {
 			//// essentially do the same thing
 			//cv::rectangle(fr, rect, cv::Scalar(0, 255, 0));
 			cv::Mat img_out;
-			cv::cvtColor(image, img_out, cv::COLOR_BGR2YUV_YV12);
+			cv::cvtColor(image, img_out, cv::COLOR_RGB2YUV_YV12);
 			//cv::cvtColor(image, img_out, cv::COLOR_BGR2YUV);
 			//std::cout << "orig:  " << std::endl << image << std::endl;
 			//std::cout << img_out << std::endl;
@@ -279,9 +279,9 @@ void Streamer::operator()(FrameQueue& frameQueue) {
 			V = V.reshape(1, image.rows / 2);
 			resize(V, V, cv::Size(image.cols/2, image.rows));
 			//img_out(cv::Rect(0, image.rows, image.cols, image.rows / 4)) = U;
-			frame->data[0] = Y.data;
-			frame->data[1] = U.data;
-			frame->data[2] = V.data;
+			// frame->data[0] = Y.data;
+			// frame->data[1] = U.data;
+			// frame->data[2] = V.data;
 
 
 			const int stride[] = { static_cast<int>(image.step[0]) };
@@ -295,7 +295,7 @@ void Streamer::operator()(FrameQueue& frameQueue) {
 			//av_image_fill_arrays(bgrFrame->data, bgrFrame->linesize, image.data, out_codec_ctx->pix_fmt, width, height, 0);
 			//sws_scale(swsctx, (uint8_t const * const *)bgrFrame->data, stride, 0, image.rows, frame->data, frame->linesize);
 
-			//sws_scale(swsctx, (uint8_t const * const *)&image.data, stride, 0, image.rows, frame->data, frame->linesize);
+			sws_scale(swsctx, (uint8_t const * const *)&image.data, stride, 0, image.rows, frame->data, frame->linesize);
 
 
 			frame->pts += av_rescale_q(1, out_codec_ctx->time_base, out_stream->time_base);
