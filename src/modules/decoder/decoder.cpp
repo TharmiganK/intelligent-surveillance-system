@@ -28,6 +28,7 @@ void Decoder::operator()(VideoStream& videoStream) {
         if (!videoStream.packetQueue.queueIsEmpty()){
 
             packet = videoStream.packetQueue.dequeuePacket();
+            count++;
 
             if (&packet){
 
@@ -41,7 +42,6 @@ void Decoder::operator()(VideoStream& videoStream) {
 
                 }
 
-                count++;
                 BOOST_LOG_TRIVIAL(info) << "Decoded frame : " << count << " from stream ID : " << videoStream.streamID;
 
             }
