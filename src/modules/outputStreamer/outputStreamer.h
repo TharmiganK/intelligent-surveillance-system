@@ -11,7 +11,7 @@
 
 #include <opencv2/highgui.hpp>
 #include <opencv2/video.hpp>
-#include <Windows.h>
+// #include <Windows.h>
 extern "C" {
 #include <libavformat/avformat.h>
 #include <libavcodec/avcodec.h>
