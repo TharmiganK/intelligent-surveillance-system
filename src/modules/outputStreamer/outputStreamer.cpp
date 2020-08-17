@@ -6,7 +6,7 @@
 
 
 #include "outputStreamer.h"
-#define MAX_NUM_FRAMES 1000
+#define MAX_NUM_FRAMES 5000
 
 
 void initialize_avformat_context(AVFormatContext *&fctx, const char *format_name)
@@ -31,41 +31,6 @@ void initialize_io_context(AVFormatContext *&fctx, const char *output)
 		}
 	}
 }
-uchar* bgr_to_yuv420p(unsigned  char* yuv420p, unsigned char* bgr, int width, int height)
-{
-	if (yuv420p == NULL || bgr == NULL)
-		return 0;
-	int frameSize = width * height;
-	int chromaSize = frameSize / 4;
-
-	int yIndex = 0;
-	int uIndex = frameSize;
-	int vIndex = frameSize + chromaSize;
-
-	int R, G, B, Y, U, V;
-	for (int i = 0; i < height; i++)
-	{
-		for (int j = 0; j < width; j++)
-		{
-			B = bgr[(i * width + j) * 3 + 0];
-			G = bgr[(i * width + j) * 3 + 1];
-			R = bgr[(i * width + j) * 3 + 2];
-
-			//BGR to YUV
-			Y = ((66 * R + 129 * G + 25 * B + 128) >> 8) + 16;
-			U = ((-38 * R - 74 * G + 112 * B + 128) >> 8) + 128;
-			V = ((112 * R - 94 * G - 18 * B + 128) >> 8) + 128;
-
-			yuv420p[yIndex++] = (unsigned char)((Y < 0) ? 0 : ((Y > 255) ? 255 : Y));
-			if (i % 2 == 0 && j % 2 == 0)
-			{
-				yuv420p[uIndex++] = (unsigned char)((U < 0) ? 0 : ((U > 255) ? 255 : U));
-				yuv420p[vIndex++] = (unsigned char)((V < 0) ? 0 : ((V > 255) ? 255 : V));
-			}
-		}
-	}
-	return yuv420p;
-}
 
 
 void set_codec_params(AVFormatContext *&fctx, AVCodecContext *&codec_ctx, double width, double height, int fps, int bitrate)
@@ -78,7 +43,7 @@ void set_codec_params(AVFormatContext *&fctx, AVCodecContext *&codec_ctx, double
 	codec_ctx->width = width;
 	codec_ctx->height = height;
 	codec_ctx->gop_size = 12;
-	codec_ctx->pix_fmt = AV_PIX_FMT_YUV420P;
+	codec_ctx->pix_fmt = AV_PIX_FMT_YUV444P;
 	codec_ctx->framerate = dst_fps;
 	codec_ctx->time_base = av_inv_q(dst_fps);
 	codec_ctx->bit_rate = bitrate;
@@ -172,7 +137,7 @@ void Streamer::operator()(FrameQueue& frameQueue) {
 	
 	int count = 0;
 
-	int camID = 0, fps = 15, width = 1920, height = 1080, bitrate = 600000;
+	int camID = 0, fps = 10, width = 1920, height = 1080, bitrate = 1000000;
 	std::string codec_profile = "high444";
 	std::string server = "rtmp://localhost/live/stream";
 	//std::string outputServer = "rtsp://localhost/mystream";
@@ -191,7 +156,6 @@ void Streamer::operator()(FrameQueue& frameQueue) {
 
 	const char *output = server.c_str();
 	int ret;
-	//auto cam = get_device(camID, width, height);
 	std::vector<uint8_t> imgbuf(height * width * 3 + 16);
 	cv::Mat image(height, width, CV_8UC3, imgbuf.data(), width * 3);
 	AVFormatContext *ofmt_ctx = nullptr;
@@ -215,7 +179,7 @@ void Streamer::operator()(FrameQueue& frameQueue) {
 	av_dump_format(ofmt_ctx, 0, output, 1);
 	//auto *swsctx = initialize_sample_scaler(out_codec_ctx, width, height);
 	AVFrame *frame = allocate_frame_buffer(out_codec_ctx, width, height);
-	//cv::namedWindow("Live", cv::WINDOW_NORMAL);
+
 	int cur_size;
 	uint8_t *cur_ptr;
 	ret = avformat_write_header(ofmt_ctx, nullptr);
@@ -224,89 +188,32 @@ void Streamer::operator()(FrameQueue& frameQueue) {
 		std::cout << "Could not write header!" << std::endl;
 		exit(1);
 	}
-	AVFrame *bgrFrame = allocate_frame_buffer(out_codec_ctx, width, height);
 	while (count < MAX_NUM_FRAMES) {
 		if (!frameQueue.queueIsEmpty()) {
 
 			image = frameQueue.dequeueFrame();
 			
-			////cv::waitKey(20);
-			//////cam.read(image);
-			////fr = image.clone();
-			//cv::Mat fr = image;
-			//int x = 0;
-			//int y = 0;
-			//int width = 50;
-			//int height = 50;
-			//// our rectangle...
-			//cv::Rect rect(x, y, width, height);
-			//// and its top left corner...
-			//cv::Point pt1(x, y);
-			//// and its bottom right corner.
-			//cv::Point pt2(x + width, y + height);
-			//// These two calls...
-			//cv::rectangle(fr, pt1, pt2, cv::Scalar(0, 255, 0));
-			//// essentially do the same thing
-			//cv::rectangle(fr, rect, cv::Scalar(0, 255, 0));
 			cv::Mat img_out;
-			cv::cvtColor(image, img_out, cv::COLOR_BGR2YUV_YV12);
-			//cv::cvtColor(image, img_out, cv::COLOR_BGR2YUV);
-			//std::cout << "orig:  " << std::endl << image << std::endl;
-			//std::cout << img_out << std::endl;
+			cv::cvtColor(image, img_out, cv::COLOR_RGB2YUV);
+			
 	
-			//cv::Mat ch1, ch2, ch3;
-			//// "channels" is a vector of 3 Mat arrays:
-			//std::vector<cv::Mat> channels(3);
-			//// split img:
-			//split(img_out, channels);
-			//// get the channels (dont forget they follow BGR order in OpenCV)
-			//ch1 = channels[0];
-			//ch2 = channels[1];
-			//resize(ch2, ch2, cv::Size(ch2.cols / 2, ch2.rows));
-			//ch3 = channels[2];
-			//resize(ch3, ch3, cv::Size(ch3.cols / 2, ch3.rows));
-			//frame->data[0] = ch1.data;
-			//frame->data[1] = ch3.data;
-			//frame->data[2] = ch2.data;
+			std::vector<cv::Mat> channels(3);
+			split(img_out, channels);
+			frame->data[0] = channels[0].data;
+			frame->data[1] = channels[2].data;
+			frame->data[2] = channels[1].data;
 			
-		
-			cv::Mat Y = img_out(cv::Rect(0, 0, image.cols, image.rows));
-			cv::Mat U = img_out(cv::Rect(0, image.rows, image.cols, image.rows / 4));
-			U = U.reshape(1, image.rows / 2);
-			resize(U, U, cv::Size(image.cols/2, image.rows));
-			//U = U.reshape(1, image.rows / 4);
-			cv::Mat V = img_out(cv::Rect(0, image.rows + image.rows / 4, image.cols, image.rows / 4));
-			V = V.reshape(1, image.rows / 2);
-			resize(V, V, cv::Size(image.cols/2, image.rows));
-			//img_out(cv::Rect(0, image.rows, image.cols, image.rows / 4)) = U;
-			frame->data[0] = Y.data;
-			frame->data[1] = U.data;
-			frame->data[2] = V.data;
-
-
-			const int stride[] = { static_cast<int>(image.step[0]) };
-
-			int linesize[8] = { 640,0,0, 0, 0, 0, 0, 0 };
-			linesize[0] = *stride;
-			//av_image_fill_arrays(frame->data, linesize, img_out.data, out_codec_ctx->pix_fmt, width, height, 0);
-			
-			//sws_scale(swsctx, (uint8_t const * const *)bgrFrame->data, stride, 0, image.rows, frame->data, frame->linesize);
-
-			//av_image_fill_arrays(bgrFrame->data, bgrFrame->linesize, image.data, out_codec_ctx->pix_fmt, width, height, 0);
-			//sws_scale(swsctx, (uint8_t const * const *)bgrFrame->data, stride, 0, image.rows, frame->data, frame->linesize);
-
+			//const int stride[] = { static_cast<int>(image.step[0]) };
 			//sws_scale(swsctx, (uint8_t const * const *)&image.data, stride, 0, image.rows, frame->data, frame->linesize);
-
 
 			frame->pts += av_rescale_q(1, out_codec_ctx->time_base, out_stream->time_base);
 			write_frame(out_codec_ctx, ofmt_ctx, frame);
-			//std::cout << "hello" << std::endl;
 			count++;
 		}
 	}
 
 	av_write_trailer(ofmt_ctx);
-
+	//sws_freeContext(swsctx);
 	av_frame_free(&frame);
 	avcodec_close(out_codec_ctx);
 	avio_close(ofmt_ctx->pb);
