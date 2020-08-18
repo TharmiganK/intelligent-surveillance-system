@@ -43,8 +43,8 @@ void HttpServer::Start(unsigned short port, unsigned int thread_pool_size)
 //stop the server.
 void HttpServer::Stop()
 {
-  m_Acceptor->Stop();
-  m_IOService.stop();
+  // m_Acceptor->Stop();
+  // m_IOService.stop();
   for(auto& th : m_ThreadPool){
     th->join();
   }

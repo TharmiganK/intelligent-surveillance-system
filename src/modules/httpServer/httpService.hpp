@@ -7,6 +7,14 @@
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
 
+#include "../streamReceiver/streamReceiver.h"
+#include "../display/display.h"
+#include "../decoder/decoder.h"
+#include "../frameQueue/frameQueue.h"
+#include "../packetQueue/packetQueue.h"
+#include "../videoStream/videoStream.h"
+#include "../outputStreamer/outputStreamer.h"
+
 //http methods types
 enum class HttpMethods{
   GET,
