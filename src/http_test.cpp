@@ -10,17 +10,6 @@ int main(int argc, char** argv)
 {
   unsigned short port = 1234;
 
-  // if(argc < 2){
-  //   std::cout<<"./httpserver <resource-directory-path>"<<std::endl;
-  //   return 0;
-  // }
-
-  // std::string path(argv[1]);
-  // if(path.at(path.length() - 1) == '/')
-  //   path.pop_back();
-  
-  // RESOURCE_DIRECTORY_PATH = std::move(path);
-
   try{
     HttpServer http_server;
 
