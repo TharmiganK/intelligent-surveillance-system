@@ -190,11 +190,30 @@ std::string HttpService::GetIp()
 void HttpService::ProcessPostRequest(std::shared_ptr<HttpRequest> httpRequest)
 {
   std::string url;
+  int streamID;
   try{
     url = httpRequest->body.get<std::string>("url");
+    streamID = httpRequest->body.get<int>("id");
     std::cout << "URL : " << url << std::endl;
+    std::cout << "Stream ID : " << streamID << std::endl;
+
+    VideoStream videoStream1(streamID, url.c_str(), 30);
+    videoStream1.OpenStream();
     m_ResponseStatusCode = 201;
     SendResponse();
+
+    std::thread streamReceiver1(StreamReceiver(),std::ref(videoStream1));
+    std::thread decoder1(Decoder(),std::ref(videoStream1));
+	  // std::thread display1(display(), std::ref(videoStream1.frameQueue));
+    std::thread streamer1(Streamer(), std::ref(videoStream1.frameQueue));
+
+
+    streamReceiver1.join();
+    decoder1.join();
+    // display1.join();
+    streamer1.join();
+
+    videoStream1.CloseStream();
   }catch(std::exception const& e){
     std::cerr<<e.what()<<std::endl;
     m_ResponseStatusCode = 400;
