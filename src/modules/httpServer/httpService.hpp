@@ -47,9 +47,9 @@ class HttpService
   private:
     std::string GetIp();
     // void ProcessGetRequest();
-    std::string GetCGIProgram(std::string);
+    // std::string GetCGIProgram(std::string);
     // void ProcessPostRequest();
-    void ExecuteProgram(std::string, std::string);
+    // void ExecuteProgram(std::string, std::string);
     // void ProcessHeadRequest();
     // void ProcessDeleteRequest();
     // void ProcessOptionsRequest();

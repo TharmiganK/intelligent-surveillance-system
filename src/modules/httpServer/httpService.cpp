@@ -21,19 +21,19 @@ for more status codes https://en.wikipedia.org/wiki/List_of_HTTP_status_codes
 */
 std::unordered_map<unsigned int, std::string> HttpStatusTable =
 {
-  {101, "Switching Protocols"},
-  {201, "Created"},
-  {202, "Accepted"},
+  {101, "101 Switching Protocols"},
+  {201, "201 Created"},
+  {202, "202 Accepted"},
   {200, "200 OK" },
-  {400, "Bad Request"},
-  {401, "Unauthorized"},
+  {400, "400 Bad Request"},
+  {401, "401 Unauthorized"},
   {404, "404 Not Found" },
-  {408, "Request Timeout"},
+  {408, "408 Request Timeout"},
   {413, "413 Request Entity Too Large" },
   {500, "500 Internal Server Error" },
   {501, "501 Not Implemented" },
-  {502, "Bad Gateway"},
-  {503, "Service Unavailable"},
+  {502, "502 Bad Gateway"},
+  {503, "503 Service Unavailable"},
   {505, "505 HTTP Version Not Supported" }
 };
 
@@ -138,11 +138,13 @@ void HttpService::HttpHandleRequest()
              switch(http_request->method){
                case HttpMethods::GET :
                 //  ProcessGetRequest();
-                 std::cout<<"GET Method"<<std::endl;
+                 m_ResponseStatusCode = 200;
+                 SendResponse();
                  break;
                case HttpMethods::POST :
                 //  ProcessPostRequest();
-                 std::cout<<"POST Method"<<std::endl;
+                 m_ResponseStatusCode = 201;
+                 SendResponse();
                  break;
                case HttpMethods::HEAD :
                 //  ProcessHeadRequest();
@@ -238,23 +240,23 @@ std::string HttpService::GetIp()
 
 // }
 
-std::string HttpService::GetCGIProgram(std::string resource_file)
-{
-  std::ifstream in(resource_file, std::ios::in);
-  char data[4096];
-  while(in.getline(data, 4096)){
-    std::string str(data);
-    std::size_t find = str.find("#!");
-    if(find != std::string::npos){
-      std::string program = str.substr(find + 2, str.length() - 2);
-      program.erase(remove_if(program.begin(), program.end(), isspace), program.end());
-      in.close();
-      return std::move(program);
-    }
-  }
-  in.close();
-  return "";
-}
+// std::string HttpService::GetCGIProgram(std::string resource_file)
+// {
+//   std::ifstream in(resource_file, std::ios::in);
+//   char data[4096];
+//   while(in.getline(data, 4096)){
+//     std::string str(data);
+//     std::size_t find = str.find("#!");
+//     if(find != std::string::npos){
+//       std::string program = str.substr(find + 2, str.length() - 2);
+//       program.erase(remove_if(program.begin(), program.end(), isspace), program.end());
+//       in.close();
+//       return std::move(program);
+//     }
+//   }
+//   in.close();
+//   return "";
+// }
 
 // void HttpService::ProcessPostRequest()
 // {
@@ -344,33 +346,33 @@ std::string HttpService::GetCGIProgram(std::string resource_file)
 //     }
 // }
 
-void HttpService::ExecuteProgram(std::string command, std::string outputfile)
-{
-  boost::process::system(command, boost::process::std_out > outputfile);
+// void HttpService::ExecuteProgram(std::string command, std::string outputfile)
+// {
+//   boost::process::system(command, boost::process::std_out > outputfile);
 
-  //set requested resouce to outputfile for response to client
-  m_RequestedResource = outputfile;
+//   //set requested resouce to outputfile for response to client
+//   m_RequestedResource = outputfile;
 		
-  //read outputfile contents
-  std::ifstream resource_fstream(outputfile, std::ifstream::binary);
+//   //read outputfile contents
+//   std::ifstream resource_fstream(outputfile, std::ifstream::binary);
 
-  if(!resource_fstream.is_open()){
-    m_ResponseStatusCode = 500;
-    return;
-  }
+//   if(!resource_fstream.is_open()){
+//     m_ResponseStatusCode = 500;
+//     return;
+//   }
 
-  m_ResponseStatusCode = 200;
+//   m_ResponseStatusCode = 200;
 
-  //find out file size
-  resource_fstream.seekg(0, std::ifstream::end);
-  m_ResourceSizeInBytes = static_cast<std::size_t>(resource_fstream.tellg());
+//   //find out file size
+//   resource_fstream.seekg(0, std::ifstream::end);
+//   m_ResourceSizeInBytes = static_cast<std::size_t>(resource_fstream.tellg());
 
-  m_ResourceBuffer.reset(new char[m_ResourceSizeInBytes]);
+//   m_ResourceBuffer.reset(new char[m_ResourceSizeInBytes]);
 
-  //read output file into resource buffer
-  resource_fstream.seekg(std::ifstream::beg);
-  resource_fstream.read(m_ResourceBuffer.get(), m_ResourceSizeInBytes);
-}
+//   //read output file into resource buffer
+//   resource_fstream.seekg(std::ifstream::beg);
+//   resource_fstream.read(m_ResourceBuffer.get(), m_ResourceSizeInBytes);
+// }
 
 //process head request by sending only headers not file
 // void HttpService::ProcessHeadRequest()
