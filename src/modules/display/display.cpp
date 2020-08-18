@@ -13,20 +13,32 @@
     frames (if there is any) from the frame queue passed as argument and displays it. After displaying
     a frame, it waits for 200 milliseconds to introduce a delay and see how queueing works.
 */
-void display::operator()(FrameQueue& frameQueue) {
+void display::operator()(VideoStream videoStreams[], int numberOfStreams) {
 
-    cv::Mat frameToDisplay;
+    cv::Mat frameToDisplay[numberOfStreams];
     int count = 0;
+    std::chrono::high_resolution_clock::time_point t1;
+    std::chrono::high_resolution_clock::time_point t2;
+    double totalTime = 0;
 
-    while(count < MAX_NUM_FRAMES) {
+    while(true) {
 
-        if (!frameQueue.queueIsEmpty()) {
+        t1 = std::chrono::high_resolution_clock::now();
 
-            frameToDisplay = frameQueue.dequeueFrame();
-            cv::imshow("frame", frameToDisplay);
-            cv::waitKey(20);
+        for (int i = 0; i < numberOfStreams; i++) {
 
-            count++;
+            if (!videoStreams[i].frameQueue.queueIsEmpty()) {
+
+                frameToDisplay[i] = videoStreams[i].frameQueue.dequeueFrame();
+                cv::imshow("frame", frameToDisplay[0]);
+                cv::waitKey(20);
+                count++;
+                t2 = std::chrono::high_resolution_clock::now();
+                totalTime = totalTime + std::chrono::duration_cast<std::chrono::duration<double>>(t2 - t1).count();
+                BOOST_LOG_TRIVIAL(info) << "FPS : " << count/(totalTime * numberOfStreams);
+                t1 = std::chrono::high_resolution_clock::now();
+
+            }
 
         }
 

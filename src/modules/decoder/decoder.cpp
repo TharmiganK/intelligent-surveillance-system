@@ -14,7 +14,7 @@
     enque the decoded frames in frame queue.
     This method is used to run in threads.
 */
-void Decoder::operator()(VideoStream& videoStream) {
+void Decoder::operator()(VideoStream videoStreams[], int numberOfStreams) {
 
     AVPacket packet;
     av_init_packet(&packet);
@@ -23,26 +23,30 @@ void Decoder::operator()(VideoStream& videoStream) {
     cv::Mat image;
     int count = 0;
 
-    while (count < MAX_NUM_FRAMES){
+    while (true) {
 
-        if (!videoStream.packetQueue.queueIsEmpty()){
+        for (int i = 0; i < numberOfStreams; i++) {
 
-            packet = videoStream.packetQueue.dequeuePacket();
-            count++;
+            if (!videoStreams[i].packetQueue.queueIsEmpty()){
 
-            if (&packet){
+                packet = videoStreams[i].packetQueue.dequeuePacket();
+                count++;
 
-                frameYUV = DecodeVideo(videoStream, &packet);
-                frameBGR = GetBGRFrame(videoStream, frameYUV);
+                if (&packet){
 
-                if(frameBGR){
+                    frameYUV = DecodeVideo(videoStreams[i], &packet);
+                    frameBGR = GetBGRFrame(videoStreams[i], frameYUV);
 
-                    image = GetImage(videoStream, frameBGR);
-                    videoStream.frameQueue.enqueueFrame(image.clone());
+                    if(frameBGR){
+
+                        image = GetImage(videoStreams[i], frameBGR);
+                        videoStreams[i].frameQueue.enqueueFrame(image.clone());
+
+                    }
+
+                    BOOST_LOG_TRIVIAL(info) << "Decoded frame : " << count << " from stream ID : " << i;
 
                 }
-
-                BOOST_LOG_TRIVIAL(info) << "Decoded frame : " << count << " from stream ID : " << videoStream.streamID;
 
             }
 

@@ -40,7 +40,7 @@ class StreamReceiver {
             @brief Method to run in Multi-thread.
             @param videoStream RTSP video stream;
         */
-        void operator()(VideoStream& videoStream);
+        void operator()(VideoStream videoStreams[],int numberOfStreams);
 
 };
 

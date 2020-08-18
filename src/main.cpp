@@ -24,6 +24,7 @@
 #define STREAM_URL "rtsp://admin:admin@192.168.1.3:8554/live"
 #define QUEUE_CAPACITY 30
 #define STREAM_ID 1
+#define NUMBER_OF_STREAMS 4
 
 /**
     @brief Main function
@@ -36,16 +37,20 @@
 int main() {
 
     BOOST_LOG_TRIVIAL(info) << "STARTING";
-    //Creating a sample VideoStream instance.
-    VideoStream videoStream1(STREAM_ID, STREAM_URL, QUEUE_CAPACITY);
-    videoStream1.OpenStream();
+    //Creating an array of video streams.
+    VideoStream* videoStreams = new VideoStream[NUMBER_OF_STREAMS];
+    for (int i = 0; i < NUMBER_OF_STREAMS; i++) { 
+
+        videoStreams[i].OpenStream(STREAM_URL);
+
+    }
 
     BOOST_LOG_TRIVIAL(info) << "INITIALIZING";
     //Creating seperate threads to receive the frames, decode and display
     XInitThreads();
-    std::thread streamReceiver1(StreamReceiver(),std::ref(videoStream1));
-    std::thread decoder1(Decoder(),std::ref(videoStream1));
-	std::thread display1(display(), std::ref(videoStream1.frameQueue));
+    std::thread streamReceiver1(StreamReceiver(),std::ref(videoStreams),NUMBER_OF_STREAMS);
+    std::thread decoder1(Decoder(),std::ref(videoStreams),NUMBER_OF_STREAMS);
+	std::thread display1(display(), std::ref(videoStreams),NUMBER_OF_STREAMS);
 
     BOOST_LOG_TRIVIAL(info) << "PROCESSING";
     
@@ -57,7 +62,11 @@ int main() {
     BOOST_LOG_TRIVIAL(info) << "PROCESS IS FINISHED";
 
     //Closing the video stream
-    videoStream1.CloseStream();
+    for (int i = 0; i < NUMBER_OF_STREAMS; i++) { 
+
+        videoStreams[i].CloseStream();
+
+    }
     
 	return 0;
 

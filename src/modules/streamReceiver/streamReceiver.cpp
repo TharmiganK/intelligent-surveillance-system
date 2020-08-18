@@ -14,20 +14,24 @@
     enque them in packet queue.
     This method is used to run in threads.
 */
-void StreamReceiver::operator()(VideoStream& videoStream) {
+void StreamReceiver::operator()(VideoStream videoStreams[],int numberOfStreams) {
 
     AVPacket packet;
     av_init_packet(&packet);
     int count = 0;
 
-    while (count < MAX_NUM_PACKETS ){
+    while (true) {
 
-        packet = GetVideoPacket(videoStream);
+        for (int i = 0; i < numberOfStreams; i++) {
 
-        videoStream.packetQueue.enqueuePacket(*av_packet_clone(&packet));
+            packet = GetVideoPacket(videoStreams[i]);
 
-        av_free_packet(&packet);
-        av_init_packet(&packet);
+            videoStreams[i].packetQueue.enqueuePacket(*av_packet_clone(&packet));
+
+            av_free_packet(&packet);
+            av_init_packet(&packet);
+            
+        }
 
         count++;
 
