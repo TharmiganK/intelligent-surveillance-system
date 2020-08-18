@@ -6,6 +6,7 @@
 #pragma once
 
 #include "../frameQueue/frameQueue.h"
+#include "../videoStream/videoStream.h"
 #include <iostream>
 #include <vector>
 
@@ -31,7 +32,7 @@ public:
 		@brief Member function to run as a seperate thread and stream the frames.
 		@param frameQueue reference to the frame queue from which frames should be taken.
 	*/
-	void operator()(FrameQueue& frameQueue);
-
+	//void operator()(FrameQueue& frameQueue);
+	void operator()(VideoStream& videoStream);
 };
 
