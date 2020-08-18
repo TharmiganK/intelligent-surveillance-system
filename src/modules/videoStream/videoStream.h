@@ -39,6 +39,7 @@ struct VideoStream {
         @param streamID ID of the associated camera stream.
         @param streamURL URL of the associated camera stream.
     */
+    VideoStream();
     VideoStream(int streamID, const char *streamURL, int queueCapacity);
 
     /**
@@ -54,7 +55,7 @@ struct VideoStream {
         @brief Open the RTSP stream.
         @return true if RTSP stream is opened sucessfully; false otherwise.
     */
-    virtual bool OpenStream();
+    virtual bool OpenStream(const char *streamURL);
 
     /**
         @brief Close the RTSP stream.
