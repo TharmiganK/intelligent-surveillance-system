@@ -48,7 +48,9 @@ std::shared_ptr<HttpRequest> HttpRequestParser::GetHttpRequest()
 {
   if(m_HttpRequest.empty())  return nullptr;
 
-  std::string request_method, resource, http_version;
+  std::string request_method, resource, http_version, body;
+  std::string text;
+  bool bodyFound = false;
   std::istringstream request_line_stream(m_HttpRequest);
   //extract request method, GET, POST, .....
   request_line_stream >> request_method;
@@ -57,10 +59,26 @@ std::shared_ptr<HttpRequest> HttpRequestParser::GetHttpRequest()
   //extract HTTP version
   request_line_stream >> http_version;
 
+  while (request_line_stream){
+    request_line_stream >> text;
+    if (text.compare("{") == 0){
+      bodyFound = true;
+    }
+    if (bodyFound){
+      body += text;
+    }
+    if (text.compare("}") == 0){
+      bodyFound = false;
+    }
+  }
+
   std::shared_ptr<HttpRequest> request(new HttpRequest);
 
   request->resource = std::move(resource);
   request->status = 0;
+  request->body = std::move(body);
+
+  std::cout << request->body << std::endl;
 
   if(request_method.compare("GET") == 0){
     request->method = HttpMethods::GET;
@@ -95,7 +113,7 @@ std::shared_ptr<HttpRequest> HttpRequestParser::GetHttpRequest()
 }
 
 
-extern std::string RESOURCE_DIRECTORY_PATH;
+// extern std::string RESOURCE_DIRECTORY_PATH;
 
 
 HttpService::HttpService(std::shared_ptr<asio::ip::tcp::socket> sock):
@@ -128,12 +146,13 @@ void HttpService::HttpHandleRequest()
            std::cout<<http_request->request;
            std::cout<<"}"<<std::endl;
 
-           std::istringstream istrstream(http_request->request);
-           while(std::getline(istrstream, m_ScriptData)){}
-             std::cout<<"ScriptData: "<<m_ScriptData<<std::endl;
+          //  std::istringstream istrstream(http_request->request);
+          //  while(std::getline(istrstream, m_ScriptData)){}
+          //    std::cout<<"ScriptData: "<<m_ScriptData<<std::endl;
 
            if(http_request->status == 0){
              m_RequestedResource = http_request->resource;
+             std::cout << m_RequestedResource << std::endl;
              //handle each method
              switch(http_request->method){
                case HttpMethods::GET :
@@ -447,10 +466,10 @@ std::string HttpService::GetResponseStatus()
   auto status_line = HttpStatusTable[m_ResponseStatusCode];
 
   response_status = std::string("HTTP/1.1 ") + status_line + "\n";
-  if(m_ResourceSizeInBytes > 0){
-    response_status += std::string("Content-Length: ") +
-                       std::to_string(m_ResourceSizeInBytes) + "\n";
-  }
+  // if(m_ResourceSizeInBytes > 0){
+  //   response_status += std::string("Content-Length: ") +
+  //                      std::to_string(m_ResourceSizeInBytes) + "\n";
+  // }
   if(!m_ContentType.empty()){
     response_status += m_ContentType + "\n";
   }else{
@@ -481,9 +500,9 @@ void HttpService::SendResponse()
   std::string response_status = GetResponseStatus();
   response_buffers.push_back(asio::buffer(std::move(response_status)));
 
-  if(m_ResourceSizeInBytes > 0){
-    response_buffers.push_back(asio::buffer(m_ResourceBuffer.get(), m_ResourceSizeInBytes));
-  }
+  // if(m_ResourceSizeInBytes > 0){
+  //   response_buffers.push_back(asio::buffer(m_ResourceBuffer.get(), m_ResourceSizeInBytes));
+  // }
 
   //send response to client with data
   asio::async_write(*m_Socket.get(),
