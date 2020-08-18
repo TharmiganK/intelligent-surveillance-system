@@ -1,4 +1,5 @@
 CC = g++
+INCLUDE_OBJ = main.o modules/frameQueue/frameQueue.o modules/decoder/decoder.o modules/display/display.o modules/streamReceiver/streamReceiver.o modules/packetQueue/packetQueue.o modules/videoStream/videoStream.o
 INCLUDE = main.cpp modules/frameQueue/frameQueue.cpp modules/decoder/decoder.cpp modules/display/display.cpp modules/streamReceiver/streamReceiver.cpp modules/packetQueue/packetQueue.cpp modules/videoStream/videoStream.cpp
 INCLUDE_TEST = test.cpp modules/frameQueue/frameQueue.cpp modules/decoder/decoder.cpp modules/display/display.cpp modules/streamReceiver/streamReceiver.cpp modules/packetQueue/packetQueue.cpp modules/videoStream/videoStream.cpp
 PKG = `pkg-config --cflags --libs libavformat libswscale libavcodec libavutil opencv4`
@@ -20,5 +21,5 @@ coverage: $(INCLUDE_TEST)
 	genhtml full_coverage.info --output-directory out
 
 clean:
-	rm -f -R *.info *.gcda *.gcno out test coverage
+	rm -f -R *.info *.gcda *.gcno *.o out test coverage
 
