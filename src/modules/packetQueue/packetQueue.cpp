@@ -31,7 +31,7 @@ PacketQueue::PacketQueue(int streamID, int queueCapacity) :
     If the queue is full it drops a packet and then add the new one.
     @sa dropPacket()
 */
-void PacketQueue::enqueuePacket(AVPacket newPacket) {
+bool PacketQueue::enqueuePacket(AVPacket newPacket) {
 
     if(PacketQueue::queueLength() < PacketQueue::queueCapacity) {
 
@@ -40,11 +40,22 @@ void PacketQueue::enqueuePacket(AVPacket newPacket) {
 
     } else {
 
-        PacketQueue::dropPacket();
-        std::lock_guard<std::mutex> guard(mutexForQueue);
-        queue.push_back(newPacket);
+        if (PacketQueue::dropPacket()) {
+
+            std::lock_guard<std::mutex> guard(mutexForQueue);
+            queue.push_back(newPacket);
+
+        } else {
+
+            BOOST_LOG_TRIVIAL(error) << "Packet queue doesn't have space";
+            return false;
+
+        }
+
         
     }
+
+    return true;
             
 }
 
@@ -86,10 +97,17 @@ bool PacketQueue::queueIsEmpty() {
     @sa enqueuePacket()
     @todo change the logic to drop a frame based on difference
 */
-void PacketQueue::dropPacket() {
+bool PacketQueue::dropPacket() {
 
-    std::lock_guard<std::mutex> guard(mutexForQueue);
-    queue.pop_front();
-    BOOST_LOG_TRIVIAL(info) << "Packet queue is full. One packet dropped";
+    if (!queueIsEmpty()) {
+
+        std::lock_guard<std::mutex> guard(mutexForQueue);
+        queue.pop_front();
+        BOOST_LOG_TRIVIAL(info) << "A packet is dropped";
+        return true;
+
+    }
+
+    return false;
 
 }

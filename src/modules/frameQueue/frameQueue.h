@@ -41,7 +41,7 @@ class FrameQueue {
             @brief To add a frame at the end of queue.
             @param newFrame The frame that should be added.
         */
-        void enqueueFrame(cv::Mat newFrame);
+        bool enqueueFrame(cv::Mat newFrame);
 
         /**
             @brief Take out the first frame from the queue.
@@ -66,7 +66,7 @@ class FrameQueue {
         /**
             @brief Drop the first frame in the queue
         */
-        void dropFrame();
+        bool dropFrame();
 
 };
 

@@ -40,7 +40,6 @@ void write_frame(AVCodecContext *codec_ctx, AVFormatContext *fmt_ctx, AVFrame *f
 */
 void Streamer::operator()(VideoStream& videoStream){
 	int count = 0;
-	
 	while (count < MAX_NUM_FRAMES) {
 		if (!videoStream.frameQueue.queueIsEmpty()) {
 
