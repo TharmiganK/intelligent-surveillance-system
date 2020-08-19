@@ -6,7 +6,7 @@
 
 #include "display.h"
 
-#define MAX_NUM_FRAMES 1000
+#define MAX_NUM_FRAMES 5000
 
 /**
     @details This is a temprary function which runs as a seperate thread where it takes the 
