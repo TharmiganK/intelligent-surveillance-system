@@ -10,6 +10,7 @@
 #include "../frameQueue/frameQueue.h"
 #include "../packetQueue/packetQueue.h"
 #include "../videoStream/videoStream.h"
+#include "tbb/concurrent_vector.h"
 #include <fstream>
 extern "C" {
 #include <libavcodec/avcodec.h>
@@ -40,7 +41,7 @@ class StreamReceiver {
             @brief Method to run in Multi-thread.
             @param videoStream RTSP video stream;
         */
-        void operator()(VideoStream videoStreams[],int numberOfStreams);
+        void operator()(tbb::concurrent_vector< std::shared_ptr< VideoStream >>& videoStreams);
 
 };
 

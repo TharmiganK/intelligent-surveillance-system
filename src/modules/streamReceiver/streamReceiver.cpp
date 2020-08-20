@@ -14,26 +14,26 @@
     enque them in packet queue.
     This method is used to run in threads.
 */
-void StreamReceiver::operator()(VideoStream videoStreams[],int numberOfStreams) {
+void StreamReceiver::operator()(tbb::concurrent_vector< std::shared_ptr< VideoStream >>& videoStreams) {
 
     AVPacket packet;
     av_init_packet(&packet);
     int count = 0;
 
-    while (true) {
+    while (count < MAX_NUM_PACKETS) {
 
-        for (int i = 0; i < numberOfStreams; i++) {
+        for (int i = 0; i < videoStreams.size(); i++) {
 
-            packet = GetVideoPacket(videoStreams[i]);
+            packet = GetVideoPacket(*videoStreams[i]);
 
-            videoStreams[i].packetQueue.enqueuePacket(*av_packet_clone(&packet));
+            videoStreams[i]->packetQueue.enqueuePacket(*av_packet_clone(&packet));
 
             av_free_packet(&packet);
             av_init_packet(&packet);
-            
-        }
 
-        count++;
+            count++; 
+
+        }
 
     }
 

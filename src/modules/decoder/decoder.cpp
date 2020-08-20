@@ -14,7 +14,7 @@
     enque the decoded frames in frame queue.
     This method is used to run in threads.
 */
-void Decoder::operator()(VideoStream videoStreams[], int numberOfStreams) {
+void Decoder::operator()(tbb::concurrent_vector< std::shared_ptr< VideoStream >>& videoStreams) {
 
     AVPacket packet;
     av_init_packet(&packet);
@@ -23,36 +23,38 @@ void Decoder::operator()(VideoStream videoStreams[], int numberOfStreams) {
     cv::Mat image;
     int count = 0;
 
-    while (true) {
+    while (count < MAX_NUM_FRAMES) {
 
-        for (int i = 0; i < numberOfStreams; i++) {
+        for (int i = 0; i < videoStreams.size(); i++) {
 
-            if (!videoStreams[i].packetQueue.queueIsEmpty()){
+            if (!videoStreams[i]->packetQueue.queueIsEmpty()){
 
-                packet = videoStreams[i].packetQueue.dequeuePacket();
-                count++;
+                packet = videoStreams[i]->packetQueue.dequeuePacket();
 
                 if (&packet){
 
-                    frameYUV = DecodeVideo(videoStreams[i], &packet);
-                    frameBGR = GetBGRFrame(videoStreams[i], frameYUV);
+                    frameYUV = DecodeVideo(*videoStreams[i], &packet);
+                    frameBGR = GetBGRFrame(*videoStreams[i], frameYUV);
 
                     if(frameBGR){
 
-                        image = GetImage(videoStreams[i], frameBGR);
-                        videoStreams[i].frameQueue.enqueueFrame(image.clone());
+                        image = GetImage(*videoStreams[i], frameBGR);
+                        videoStreams[i]->frameQueue.enqueueFrame(image.clone());
 
                     }
 
-                    BOOST_LOG_TRIVIAL(info) << "Decoded frame : " << count << " from stream ID : " << i;
+                    BOOST_LOG_TRIVIAL(info) << "Decoded frame : " << count << " from stream ID : " << videoStreams[i]->streamID;
 
                 }
+
+                count++;
 
             }
 
         }
 
     }
+    BOOST_LOG_TRIVIAL(info) << "DECODING IS FINISHED";
     
 }
 

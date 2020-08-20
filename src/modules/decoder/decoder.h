@@ -10,6 +10,7 @@
 #include "../packetQueue/packetQueue.h"
 #include "../videoStream/videoStream.h"
 #include <fstream>
+#include "tbb/concurrent_vector.h"
 #include <boost/log/trivial.hpp>
 extern "C" {
 #include <libavcodec/avcodec.h>
@@ -53,7 +54,7 @@ class Decoder {
             @brief Method to run in Multi-thread.
             @param videoStream RTSP video stream;
         */
-        void operator()(VideoStream videoStreams[], int numberOfStreams);
+        void operator()(tbb::concurrent_vector< std::shared_ptr< VideoStream >>& videoStreams);
 
 };
 
