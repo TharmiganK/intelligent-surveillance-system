@@ -10,27 +10,12 @@
     @details Constructor of VideoStream to define the attributes of a camera stream with
     default values and to initialize queues for the stream with queueCapacity.
 */
-VideoStream::VideoStream():
-
-    frameQueue(streamID,30),
-    packetQueue(streamID,30),
-    videoBaseTime(0.0),
-    videoFPS(0.0),
-    isOpen(false),
-    videoStreamIndex(-1),
-    videoCodecCtx(NULL),
-    formatCtx(NULL)
-
-    {
-        
-    }
-
 VideoStream::VideoStream(int streamID, const char *streamURL, int queueCapacity):
 
     streamID(streamID),
     streamURL(streamURL),
-    frameQueue(streamID,queueCapacity),
-    packetQueue(streamID,queueCapacity),
+    frameQueue(queueCapacity),
+    packetQueue(queueCapacity),
     videoBaseTime(0.0),
     videoFPS(0.0),
     isOpen(false),
@@ -47,9 +32,8 @@ VideoStream::VideoStream(int streamID, const char *streamURL, int queueCapacity)
     URL and configuresfps and basetime in addition to format context of 
     the stream.
 */
-bool VideoStream::OpenStream(const char *streamURL){
+bool VideoStream::OpenStream(){
 
-    this->streamURL = streamURL;
     CloseStream();
 
     // Register all components
