@@ -22,7 +22,6 @@ class FrameQueue {
 
     private:
 
-        int streamID; /*!< ID of the associated video stream */
         boost::circular_buffer<cv::Mat> queue; /*!< A circular buffer queue to keep the incoming frames */
         int queueCapacity; /*!< Maximum number of frames that can be present inside the queue */
         std::mutex mutexForQueue; /*!< Mutex to give exclusive access to the queue */
@@ -35,7 +34,7 @@ class FrameQueue {
             @param streamID ID of the associated camera stream.
             @param queueCapacity Number of frames that can exist in the queue.
         */
-        FrameQueue(int streamID, int queueCapacity);
+        FrameQueue(int queueCapacity);
 
         /**
             @brief To add a frame at the end of queue.

@@ -16,9 +16,8 @@
     define the number of frames that should be allowed to be present in the queue.
     Memory for the queue is also allocated with a size of queueCapacity.
 */
-FrameQueue::FrameQueue(int streamID, int queueCapacity) :
+FrameQueue::FrameQueue(int queueCapacity) :
 
-    streamID(streamID),
     queueCapacity(queueCapacity),
     queue(queueCapacity)
 

@@ -16,9 +16,8 @@
     define the number of packets that should be allowed to be present in the queue.
     Memory for the queue is also allocated with a size of queueCapacity.
 */
-PacketQueue::PacketQueue(int streamID, int queueCapacity) :
+PacketQueue::PacketQueue(int queueCapacity) :
 
-    streamID(streamID),
     queueCapacity(queueCapacity),
     queue(queueCapacity)
     

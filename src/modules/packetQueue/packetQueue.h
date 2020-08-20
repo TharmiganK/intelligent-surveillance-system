@@ -28,7 +28,6 @@ class PacketQueue {
 
     private:
 
-        int streamID; /*!< ID of the associated video stream */
         boost::circular_buffer<AVPacket> queue; /*!< A circular buffer queue to keep the incoming frames */
         int queueCapacity; /*!< Maximum number of frames that can be present inside the queue */
         std::mutex mutexForQueue; /*!< Mutex to give exclusive access to the queue */
@@ -41,7 +40,7 @@ class PacketQueue {
             @param streamID ID of the associated camera stream.
             @param queueCapacity Number of packets that can exist in the queue.
         */
-        PacketQueue(int streamID, int queueCapacity);
+        PacketQueue(int queueCapacity);
 
         /**
             @brief To add a packet at the end of queue.
