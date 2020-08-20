@@ -1,9 +1,9 @@
 CC = g++
 INCLUDE_OBJ = main.o modules/frameQueue/frameQueue.o modules/decoder/decoder.o modules/display/display.o modules/streamReceiver/streamReceiver.o modules/packetQueue/packetQueue.o modules/videoStream/videoStream.o
-INCLUDE = main.cpp modules/frameQueue/frameQueue.cpp modules/decoder/decoder.cpp modules/display/display.cpp modules/streamReceiver/streamReceiver.cpp modules/packetQueue/packetQueue.cpp modules/videoStream/videoStream.cpp
+INCLUDE = main.cpp modules/frameQueue/frameQueue.cpp modules/decoder/decoder.cpp modules/display/display.cpp modules/streamReceiver/streamReceiver.cpp modules/packetQueue/packetQueue.cpp modules/videoStream/videoStream.cpp modules/processor/processor.cpp
 INCLUDE_TEST = test.cpp modules/frameQueue/frameQueue.cpp modules/decoder/decoder.cpp modules/display/display.cpp modules/streamReceiver/streamReceiver.cpp modules/packetQueue/packetQueue.cpp modules/videoStream/videoStream.cpp
 PKG = `pkg-config --cflags --libs libavformat libswscale libavcodec libavutil opencv4`
-CFLAGS = -lboost_log -lpthread -std=c++0x -pthread -lX11
+CFLAGS = -lboost_log -lpthread -std=c++0x -pthread -lX11 -ltbb
 
 main: $(INCLUDE)
 	$(CC) -w -DBOOST_LOG_DYN_LINK $(INCLUDE) $(CFLAGS) -o $@ $(PKG)
