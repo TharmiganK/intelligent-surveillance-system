@@ -4,7 +4,6 @@
 */
 
 /**
-    @todo Create makefile
     @todo Create configs class
     @todo unit test
  */
@@ -20,11 +19,13 @@
 #include "modules/frameQueue/frameQueue.h"
 #include "modules/packetQueue/packetQueue.h"
 #include "modules/videoStream/videoStream.h"
+#include "modules/processor/processor.h"
 
-#define STREAM_URL "rtsp://admin:admin@192.168.1.3:8554/live"
+#define STREAM_URL "rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov"
 #define QUEUE_CAPACITY 30
 #define STREAM_ID 1
-#define NUMBER_OF_STREAMS 4
+#define NUMBER_OF_STREAMS 3
+#define NUMBER_OF_WORKERS 3
 
 /**
     @brief Main function
@@ -37,36 +38,28 @@
 int main() {
 
     BOOST_LOG_TRIVIAL(info) << "STARTING";
-    //Creating an array of video streams.
-    VideoStream* videoStreams = new VideoStream[NUMBER_OF_STREAMS];
-    for (int i = 0; i < NUMBER_OF_STREAMS; i++) { 
+    //Creating processors
+    Processor* processors = new Processor[NUMBER_OF_STREAMS];
 
-        videoStreams[i].OpenStream(STREAM_URL);
+    //Initializing video streams and start processing
+    BOOST_LOG_TRIVIAL(info) << "INITIALIZING";
+    for (int i = 0; i < NUMBER_OF_STREAMS; i++) {
+
+        processors[i].addStream(new VideoStream(i, STREAM_URL, QUEUE_CAPACITY));
+        processors[i].process();
 
     }
-
-    BOOST_LOG_TRIVIAL(info) << "INITIALIZING";
-    //Creating seperate threads to receive the frames, decode and display
-    XInitThreads();
-    std::thread streamReceiver1(StreamReceiver(),std::ref(videoStreams),NUMBER_OF_STREAMS);
-    std::thread decoder1(Decoder(),std::ref(videoStreams),NUMBER_OF_STREAMS);
-	std::thread display1(display(), std::ref(videoStreams),NUMBER_OF_STREAMS);
 
     BOOST_LOG_TRIVIAL(info) << "PROCESSING";
-    
+
     //Waiting until the processes are over
-    streamReceiver1.join();
-    decoder1.join();
-    display1.join();
+    for (int i = 0; i < NUMBER_OF_STREAMS; i++) {
 
-    BOOST_LOG_TRIVIAL(info) << "PROCESS IS FINISHED";
-
-    //Closing the video stream
-    for (int i = 0; i < NUMBER_OF_STREAMS; i++) { 
-
-        videoStreams[i].CloseStream();
+        processors[i].join();
 
     }
+
+    BOOST_LOG_TRIVIAL(info) << "PROCESS IS FINISHED";
     
 	return 0;
 
