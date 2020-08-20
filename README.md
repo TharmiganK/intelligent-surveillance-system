@@ -6,17 +6,19 @@
 - OpenCV
 - FFMPEG
 - Boost
+- TBB
 
 
 ## Usage
-
-In develop branch
 
 ```
 cd src
 ```
 ```
-g++ -w -DBOOST_LOG_DYN_LINK main.cpp modules/frameQueue/frameQueue.cpp modules/decoder/decoder.cpp modules/display/display.cpp modules/streamReceiver/streamReceiver.cpp modules/packetQueue/packetQueue.cpp modules/videoStream/videoStream.cpp -lboost_log -lpthread -o main -std=c++0x -pthread -lX11 $(pkg-config --cflags --libs libavformat libswscale libavcodec libavutil opencv4)
+make
+```
+```
+./main
 ```
 
 
