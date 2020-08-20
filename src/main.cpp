@@ -20,6 +20,8 @@
 #include "modules/packetQueue/packetQueue.h"
 #include "modules/videoStream/videoStream.h"
 #include "modules/processor/processor.h"
+#include "modules/outputStreamer/outputStreamer.h"
+
 
 #define STREAM_URL "rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov"
 #define QUEUE_CAPACITY 30

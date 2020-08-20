@@ -7,6 +7,7 @@
 - FFMPEG
 - Boost
 - TBB
+- nginx
 
 
 ## Usage
@@ -19,6 +20,7 @@ make
 ```
 ```
 ./main
+
 ```
 
 
