@@ -13,6 +13,7 @@
 #include <thread>
 #include <X11/Xlib.h>
 #include <boost/log/trivial.hpp>
+#include <boost/asio.hpp>
 #include "modules/streamReceiver/streamReceiver.h"
 #include "modules/display/display.h"
 #include "modules/decoder/decoder.h"
@@ -21,9 +22,10 @@
 #include "modules/videoStream/videoStream.h"
 #include "modules/processor/processor.h"
 #include "modules/outputStreamer/outputStreamer.h"
+#include "modules/httpServer/httpServer.hpp"
 
 
-#define STREAM_URL "rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov"
+#define STREAM_URL "rtsp://192.168.1.10:8080/h264_ulaw.sdp"
 #define QUEUE_CAPACITY 30
 #define STREAM_ID 1
 #define NUMBER_OF_STREAMS 3
@@ -63,6 +65,30 @@ int main() {
 
     BOOST_LOG_TRIVIAL(info) << "PROCESS IS FINISHED";
     
-	return 0;
+    return 0;
+//     unsigned short port = 1234;
+
+//     try{
+//         HttpServer http_server;
+
+//         unsigned int thread_pool_size = std::thread::hardware_concurrency() * 2;
+
+//         if(thread_pool_size == 0)
+//             thread_pool_size = 2;
+
+//         http_server.Start(port, thread_pool_size);
+
+//         //keep alive server for 5 minutes, delete this and next line
+//         //if you want to keep it alive for infinite time
+//         std::this_thread::sleep_for(std::chrono::seconds(60 * 5));
+
+//         http_server.Stop();
+
+//     }catch(boost::system::system_error &e){
+//         std::cout<<"Error occured, Error code = "<<e.code() 
+//              <<" Message: "<<e.what();
+//     }
+
+//   return 0;
 
 }
