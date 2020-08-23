@@ -7,13 +7,14 @@
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
 
-#include "../streamReceiver/streamReceiver.h"
-#include "../display/display.h"
-#include "../decoder/decoder.h"
-#include "../frameQueue/frameQueue.h"
-#include "../packetQueue/packetQueue.h"
+// #include "../streamReceiver/streamReceiver.h"
+// #include "../display/display.h"
+// #include "../decoder/decoder.h"
+// #include "../frameQueue/frameQueue.h"
+// #include "../packetQueue/packetQueue.h"
 #include "../videoStream/videoStream.h"
-#include "../outputStreamer/outputStreamer.h"
+// #include "../outputStreamer/outputStreamer.h"
+#include "../processor/processor.h"
 
 //http methods types
 enum class HttpMethods{
@@ -58,6 +59,7 @@ class HttpService
   private:
     std::string GetIp();
     void ProcessPostRequest(std::shared_ptr<HttpRequest> httpRequest);
+    void addStream(std::shared_ptr<HttpRequest> httpRequest);
     std::string GetResponseStatus();
     void SendResponse();
     void Finish();
