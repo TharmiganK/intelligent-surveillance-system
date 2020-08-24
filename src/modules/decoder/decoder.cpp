@@ -1,6 +1,6 @@
 /**
     Intelligent Surveillance System
-    @file decoder.h
+    @file decoder.cpp
     @author Tharmigan Krishnananthalingam
 */
 
