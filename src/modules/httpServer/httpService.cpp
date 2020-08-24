@@ -205,7 +205,7 @@ void HttpService::ProcessPostRequest(std::shared_ptr<HttpRequest> httpRequest)
     std::thread streamReceiver1(StreamReceiver(),std::ref(videoStream1));
     std::thread decoder1(Decoder(),std::ref(videoStream1));
 	  // std::thread display1(display(), std::ref(videoStream1.frameQueue));
-    std::thread streamer1(Streamer(), std::ref(videoStream1.frameQueue));
+    std::thread streamer1(Streamer(), std::ref(videoStream1));
 
 
     streamReceiver1.join();
