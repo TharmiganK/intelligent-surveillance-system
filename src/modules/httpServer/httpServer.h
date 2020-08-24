@@ -13,7 +13,7 @@
 #include <thread>
 #include <boost/asio.hpp>
 
-#include "httpAcceptor.hpp"
+#include "httpAcceptor.h"
 
 /**
     @class Class to run a HTTP server
