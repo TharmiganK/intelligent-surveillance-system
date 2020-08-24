@@ -22,7 +22,7 @@
 #include "modules/videoStream/videoStream.h"
 #include "modules/processor/processor.h"
 #include "modules/outputStreamer/outputStreamer.h"
-#include "modules/httpServer/httpServer.hpp"
+#include "modules/httpServer/httpServer.h"
 
 //#define STREAM_URL "rtsp://192.168.1.3:8080/h264_ulaw.sdp"
 #define STREAM_URL "rtsp://admin:ELBXGJ@192.168.1.6:554/h264_stream"
