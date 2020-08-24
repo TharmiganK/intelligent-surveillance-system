@@ -24,12 +24,14 @@
 class HttpServer{
 
     private:
+    
         boost::asio::io_service m_IOService; /*!< IOService to connect sockets */
         std::unique_ptr<boost::asio::io_service::work> m_Work; /*!< Defines a service work to be done */
         std::unique_ptr<HttpAcceptor> m_Acceptor;  /*!< HTTP Acceptor object */
         std::vector<std::unique_ptr<std::thread>> m_ThreadPool;  /*!< Listening threads vector */
 
     public:
+
         /**
             @brief Constructor of class HttpServer.
         */
