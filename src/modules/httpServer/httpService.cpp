@@ -322,6 +322,9 @@ void HttpService::Finish(){
 
 }
 
+/**
+    @details Sends the HTTP response by writing it in the socket.
+*/
 void HttpService::SendResponse(){
 
     std::vector<asio::const_buffer> response_buffers;
