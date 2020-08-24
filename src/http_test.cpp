@@ -2,7 +2,7 @@
 #include <thread>
 #include <boost/asio.hpp>
 
-#include "modules/httpServer/httpServer.hpp"
+#include "modules/httpServer/httpServer.h"
 
 // std::string RESOURCE_DIRECTORY_PATH;
 
