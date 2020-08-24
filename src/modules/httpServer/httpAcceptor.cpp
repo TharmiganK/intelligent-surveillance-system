@@ -4,8 +4,8 @@
 #include <iostream>
 #include <boost/asio.hpp>
 
-#include "httpService.hpp"
-#include "httpAcceptor.hpp"
+#include "httpService.h"
+#include "httpAcceptor.h"
 
 using namespace boost;
 

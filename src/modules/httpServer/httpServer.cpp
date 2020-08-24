@@ -11,7 +11,7 @@
 #include <boost/asio.hpp>
 #include <boost/log/trivial.hpp>
 
-#include "httpServer.hpp"
+#include "httpServer.h"
 
 using namespace boost;
 

@@ -12,7 +12,7 @@
 #include <boost/algorithm/string.hpp>
 
 
-#include "httpService.hpp"
+#include "httpService.h"
 
 #define QUEUE_CAPACITY 30
 
