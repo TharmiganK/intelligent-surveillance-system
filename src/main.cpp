@@ -11,7 +11,7 @@
 #include <iostream>
 #include <opencv2/opencv.hpp>
 #include <thread>
-#include <X11/Xlib.h>
+//#include <X11/Xlib.h>
 #include <boost/log/trivial.hpp>
 #include <boost/asio.hpp>
 #include "modules/streamReceiver/streamReceiver.h"
@@ -24,9 +24,11 @@
 #include "modules/outputStreamer/outputStreamer.h"
 #include "modules/httpServer/httpServer.hpp"
 
+//#define STREAM_URL "rtsp://192.168.1.3:8080/h264_ulaw.sdp"
+#define STREAM_URL "rtsp://admin:ELBXGJ@192.168.1.6:554/h264_stream"
 
-#define STREAM_URL "rtsp://192.168.1.10:8080/h264_ulaw.sdp"
-#define QUEUE_CAPACITY 30
+#define STREAM_CAMERA 0
+#define QUEUE_CAPACITY 500
 #define STREAM_ID 1
 #define NUMBER_OF_STREAMS 3
 #define NUMBER_OF_WORKERS 3
@@ -42,11 +44,13 @@
 int main() {
 
     BOOST_LOG_TRIVIAL(info) << "STARTING";
+
     //Creating processors
     Processor* processors = new Processor[NUMBER_OF_STREAMS];
 
     //Initializing video streams and start processing
     BOOST_LOG_TRIVIAL(info) << "INITIALIZING";
+
     for (int i = 0; i < NUMBER_OF_STREAMS; i++) {
 
         processors[i].addStream(new VideoStream(i, STREAM_URL, QUEUE_CAPACITY));

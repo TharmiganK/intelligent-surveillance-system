@@ -6,7 +6,7 @@
 
 #include "decoder.h"
 
-#define MAX_NUM_FRAMES 1000
+#define MAX_NUM_FRAMES 5000
 
 /**
     @details operator method accepts the initiated video stream

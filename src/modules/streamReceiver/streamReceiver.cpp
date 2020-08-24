@@ -6,7 +6,7 @@
 
 #include "streamReceiver.h"
 
-#define MAX_NUM_PACKETS 1000
+#define MAX_NUM_PACKETS 5000
 
 /**
     @details operator method accepts the initiated video stream
