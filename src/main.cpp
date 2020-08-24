@@ -20,6 +20,10 @@
 #include "modules/packetQueue/packetQueue.h"
 #include "modules/videoStream/videoStream.h"
 #include "modules/processor/processor.h"
+#include <bsoncxx/builder/stream/document.hpp>
+#include <bsoncxx/json.hpp>
+#include <mongocxx/client.hpp>
+#include <mongocxx/instance.hpp>
 
 #define STREAM_URL "rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov"
 #define QUEUE_CAPACITY 30
@@ -43,10 +47,21 @@ int main() {
 
     //Initializing video streams and start processing
     BOOST_LOG_TRIVIAL(info) << "INITIALIZING";
-    for (int i = 0; i < NUMBER_OF_STREAMS; i++) {
+    mongocxx::instance inst{};
+    mongocxx::client conn{mongocxx::uri{}};
+    auto collection = conn["video_analytics"]["camera_streams"];
+    auto cursor = collection.find({});
+    // bsoncxx::builder::stream::document document{};
+    // document << "stream_id" << 4;
+    // document << "stream_url" << "rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov";
+    // collection.insert_one(document.view());
+    int i = 0;
 
-        processors[i].addStream(new VideoStream(i, STREAM_URL, QUEUE_CAPACITY));
+    for (auto&& doc : cursor) {
+
+        processors[i].addStream(new VideoStream(i, doc["stream_url"].get_utf8().value.to_string().c_str(), QUEUE_CAPACITY));
         processors[i].process();
+        i++;
 
     }
 
