@@ -14,8 +14,8 @@ VideoStream::VideoStream(int streamID, const char *streamURL, int queueCapacity)
 
 	streamID(streamID),
 	streamURL(streamURL),
-	frameQueue(streamID, queueCapacity),
-	packetQueue(streamID, queueCapacity),
+	frameQueue(queueCapacity),
+	packetQueue(queueCapacity),
 	videoBaseTime(0.0),
 	videoFPS(0.0),
 	isOpen(false),
