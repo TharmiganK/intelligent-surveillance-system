@@ -4,7 +4,6 @@
     @author Tharmigan Krishnananthalingam
 */
 
-
 #ifndef _HTTPSERVICE_HPP
 #define _HTTPSERVICE_HPP
 
