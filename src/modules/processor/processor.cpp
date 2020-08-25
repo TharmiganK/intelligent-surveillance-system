@@ -7,6 +7,7 @@ void Processor::process() {
     streamReceiver1 = new std::thread(StreamReceiver(),std::ref(videoStreams));
     decoder1 = new std::thread(Decoder(),std::ref(videoStreams));
 	display1 = new std::thread(display(), std::ref(videoStreams));
+    outputStreamer1 = new std::thread(Streamer(), std::ref(videoStreams));
 
 }
 

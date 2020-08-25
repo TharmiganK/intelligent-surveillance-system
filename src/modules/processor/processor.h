@@ -2,6 +2,7 @@
 #include "../decoder/decoder.h"
 #include "../display/display.h"
 #include "../videoStream/videoStream.h"
+#include "../outputStreamer/outputStreamer.h"
 #include <vector>
 #include "tbb/concurrent_vector.h"
 #include <thread>
@@ -14,6 +15,7 @@ class Processor {
     std::thread* streamReceiver1;
     std::thread* decoder1;
 	std::thread* display1;
+    std::thread* outputStreamer1;
 
     public:
     
