@@ -9,6 +9,7 @@
 #include "../videoStream/videoStream.h"
 #include <iostream>
 #include <vector>
+#include "tbb/concurrent_vector.h"
 
 #include <opencv2/highgui.hpp>
 #include <opencv2/video.hpp>
@@ -33,6 +34,6 @@ public:
 		@param frameQueue reference to the frame queue from which frames should be taken.
 	*/
 	//void operator()(FrameQueue& frameQueue);
-	void operator()(VideoStream& videoStream);
+	void operator()(tbb::concurrent_vector< std::shared_ptr< VideoStream >>& videoStreams);
 };
 
