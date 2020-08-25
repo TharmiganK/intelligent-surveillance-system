@@ -6,7 +6,7 @@ PKG = `pkg-config --cflags --libs libavformat libswscale libavcodec libavutil op
 CFLAGS = -lboost_log -lpthread -std=c++0x -pthread -lX11 -ltbb
 
 main: $(INCLUDE)
-	$(CC) -w -DBOOST_LOG_DYN_LINK $(INCLUDE) $(CFLAGS) -o $@ $(PKG)
+	$(CC) -w -g -DBOOST_LOG_DYN_LINK $(INCLUDE) $(CFLAGS) -o $@ $(PKG)
 
 test: $(INCLUDE_TEST)
 	$(CC) -w -DBOOST_LOG_DYN_LINK $(INCLUDE_TEST) -lboost_unit_test_framework $(CFLAGS) -o $@ $(PKG)
