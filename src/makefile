@@ -2,7 +2,7 @@ CC = g++
 INCLUDE_OBJ = main.o modules/frameQueue/frameQueue.o modules/decoder/decoder.o modules/display/display.o modules/streamReceiver/streamReceiver.o modules/packetQueue/packetQueue.o modules/videoStream/videoStream.o modules/httpServer/httpServer.o modules/httpServer/httpAcceptor.o modules/httpServer/httpService.o modules/outputStreamer/outputStreamer.o
 INCLUDE = main.cpp modules/frameQueue/frameQueue.cpp modules/decoder/decoder.cpp modules/display/display.cpp modules/streamReceiver/streamReceiver.cpp modules/packetQueue/packetQueue.cpp modules/videoStream/videoStream.cpp modules/processor/processor.cpp modules/httpServer/httpServer.cpp modules/httpServer/httpAcceptor.cpp modules/httpServer/httpService.cpp modules/outputStreamer/outputStreamer.cpp
 INCLUDE_TEST = test.cpp modules/frameQueue/frameQueue.cpp modules/decoder/decoder.cpp modules/display/display.cpp modules/streamReceiver/streamReceiver.cpp modules/packetQueue/packetQueue.cpp modules/videoStream/videoStream.cpp
-PKG = `pkg-config --cflags --libs libavformat libswscale libavcodec libavutil opencv4`
+PKG = `pkg-config --cflags --libs libavformat libswscale libavcodec libavutil opencv4 libmongocxx`
 CFLAGS = -lboost_log -lpthread -std=c++0x -pthread -lX11 -ltbb
 
 main: $(INCLUDE)

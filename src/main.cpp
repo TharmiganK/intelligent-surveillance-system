@@ -23,6 +23,10 @@
 #include "modules/processor/processor.h"
 #include "modules/outputStreamer/outputStreamer.h"
 #include "modules/httpServer/httpServer.h"
+#include <bsoncxx/builder/stream/document.hpp>
+#include <bsoncxx/json.hpp>
+#include <mongocxx/client.hpp>
+#include <mongocxx/instance.hpp>
 
 //#define STREAM_URL "rtsp://192.168.1.3:8080/h264_ulaw.sdp"
 #define STREAM_URL "rtsp://admin:ELBXGJ@192.168.1.6:554/h264_stream"
@@ -51,10 +55,21 @@ int main() {
     //Initializing video streams and start processing
     BOOST_LOG_TRIVIAL(info) << "INITIALIZING";
 
-    for (int i = 0; i < NUMBER_OF_STREAMS; i++) {
+    mongocxx::instance inst{};
+    mongocxx::client conn{mongocxx::uri{}};
+    auto collection = conn["video_analytics"]["camera_streams"];
+    auto cursor = collection.find({});
+    // bsoncxx::builder::stream::document document{};
+    // document << "stream_id" << 4;
+    // document << "stream_url" << "rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov";
+    // collection.insert_one(document.view());
+    int i = 0;
 
-        processors[i].addStream(new VideoStream(i, STREAM_URL, QUEUE_CAPACITY));
+    for (auto&& doc : cursor) {
+
+        processors[i].addStream(new VideoStream(i, doc["stream_url"].get_utf8().value.to_string().c_str(), QUEUE_CAPACITY));
         processors[i].process();
+        i++;
 
     }
 
