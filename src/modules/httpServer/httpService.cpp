@@ -88,6 +88,7 @@ std::shared_ptr<HttpRequest> HttpRequestParser::GetHttpRequest(){
 
         if (text.compare("}") == 0){
             bodyFound = false;
+            break;
         }
     }
 
@@ -233,7 +234,7 @@ std::string HttpService::GetIp(){
 */
 void HttpService::ProcessPostRequest(std::shared_ptr<HttpRequest> httpRequest){
 
-    if (httpRequest->resource.compare("/addStream")){
+    if (httpRequest->resource.compare("/addStream") == 0){
         addStream(httpRequest);
     }
     else{
@@ -291,23 +292,23 @@ std::string HttpService::GetResponseStatus(){
 
     auto status_line = HttpStatusTable[m_ResponseStatusCode];
 
-    response_status = std::string("HTTP/1.1 ") + status_line + "\n";
+    response_status = std::string("HTTP/1.1 ") + status_line + "\r\n";
 
     if(!m_ContentType.empty()){
-        response_status += m_ContentType + "\n";
+        response_status += m_ContentType + "\r\n";
     }
     else{
-        response_status += std::string("Content-Type: text/html") + "\n";
+        response_status += std::string("Content-Type: text/html") + "\r\n";
     }
 
     if(!m_ServerOptions.empty()){
-        response_status += std::string("Allow: ") + std::move(m_ServerOptions) + "\n";
+        response_status += std::string("Allow: ") + std::move(m_ServerOptions) + "\r\n";
     }
 
-    response_status += std::string("Server: TinyHttpWebServer/0.0.1") + "\n";
-    response_status += std::string("AcceptRanges: bytes") + "\n";
-    response_status += std::string("Connection: Closed") + "\n";
-    response_status += std::string("Date: ") + timestr + "\n";
+    response_status += std::string("Server: TinyHttpWebServer/0.0.1") + "\r\n";
+    response_status += std::string("AcceptRanges: bytes") + "\r\n";
+    response_status += std::string("Connection: Closed") + "\r\n";
+    response_status += std::string("Date: ") + timestr + "\r\n";
 
     return std::move(response_status);
 
