@@ -23,10 +23,10 @@
 #include "modules/processor/processor.h"
 #include "modules/outputStreamer/outputStreamer.h"
 #include "modules/httpServer/httpServer.h"
-#include <bsoncxx/builder/stream/document.hpp>
-#include <bsoncxx/json.hpp>
-#include <mongocxx/client.hpp>
-#include <mongocxx/instance.hpp>
+// #include <bsoncxx/builder/stream/document.hpp>
+// #include <bsoncxx/json.hpp>
+// #include <mongocxx/client.hpp>
+// #include <mongocxx/instance.hpp>
 
 //#define STREAM_URL "rtsp://192.168.1.3:8080/h264_ulaw.sdp"
 #define STREAM_URL "rtsp://admin:ELBXGJ@192.168.1.6:554/h264_stream"
@@ -47,67 +47,67 @@
 */
 int main() {
 
-    BOOST_LOG_TRIVIAL(info) << "STARTING";
+    // BOOST_LOG_TRIVIAL(info) << "STARTING";
 
-    //Creating processors
-    Processor* processors = new Processor[NUMBER_OF_STREAMS];
+    // //Creating processors
+    // Processor* processors = new Processor[NUMBER_OF_STREAMS];
 
-    //Initializing video streams and start processing
-    BOOST_LOG_TRIVIAL(info) << "INITIALIZING";
+    // //Initializing video streams and start processing
+    // BOOST_LOG_TRIVIAL(info) << "INITIALIZING";
 
-    mongocxx::instance inst{};
-    mongocxx::client conn{mongocxx::uri{}};
-    auto collection = conn["video_analytics"]["camera_streams"];
-    auto cursor = collection.find({});
-    // bsoncxx::builder::stream::document document{};
-    // document << "stream_id" << 4;
-    // document << "stream_url" << "rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov";
-    // collection.insert_one(document.view());
-    int i = 0;
+    // mongocxx::instance inst{};
+    // mongocxx::client conn{mongocxx::uri{}};
+    // auto collection = conn["video_analytics"]["camera_streams"];
+    // auto cursor = collection.find({});
+    // // bsoncxx::builder::stream::document document{};
+    // // document << "stream_id" << 4;
+    // // document << "stream_url" << "rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov";
+    // // collection.insert_one(document.view());
+    // int i = 0;
 
-    for (auto&& doc : cursor) {
+    // for (auto&& doc : cursor) {
 
-        processors[i].addStream(new VideoStream(i, doc["stream_url"].get_utf8().value.to_string().c_str(), QUEUE_CAPACITY));
-        processors[i].process();
-        i++;
+    //     processors[i].addStream(new VideoStream(i, doc["stream_url"].get_utf8().value.to_string().c_str(), QUEUE_CAPACITY));
+    //     processors[i].process();
+    //     i++;
 
-    }
+    // }
 
-    BOOST_LOG_TRIVIAL(info) << "PROCESSING";
+    // BOOST_LOG_TRIVIAL(info) << "PROCESSING";
 
-    //Waiting until the processes are over
-    for (int i = 0; i < NUMBER_OF_STREAMS; i++) {
+    // //Waiting until the processes are over
+    // for (int i = 0; i < NUMBER_OF_STREAMS; i++) {
 
-        processors[i].join();
+    //     processors[i].join();
 
-    }
+    // }
 
-    BOOST_LOG_TRIVIAL(info) << "PROCESS IS FINISHED";
+    // BOOST_LOG_TRIVIAL(info) << "PROCESS IS FINISHED";
     
-    return 0;
-//     unsigned short port = 1234;
+    // return 0;
+    unsigned short port = 1234;
 
-//     try{
-//         HttpServer http_server;
+    try{
+        HttpServer http_server;
 
-//         unsigned int thread_pool_size = std::thread::hardware_concurrency() * 2;
+        unsigned int thread_pool_size = std::thread::hardware_concurrency() * 2;
 
-//         if(thread_pool_size == 0)
-//             thread_pool_size = 2;
+        if(thread_pool_size == 0)
+            thread_pool_size = 2;
 
-//         http_server.Start(port, thread_pool_size);
+        http_server.Start(port, thread_pool_size);
 
-//         //keep alive server for 5 minutes, delete this and next line
-//         //if you want to keep it alive for infinite time
-//         std::this_thread::sleep_for(std::chrono::seconds(60 * 5));
+        //keep alive server for 5 minutes, delete this and next line
+        //if you want to keep it alive for infinite time
+        std::this_thread::sleep_for(std::chrono::seconds(60 * 5));
 
-//         http_server.Stop();
+        http_server.Stop();
 
-//     }catch(boost::system::system_error &e){
-//         std::cout<<"Error occured, Error code = "<<e.code() 
-//              <<" Message: "<<e.what();
-//     }
+    }catch(boost::system::system_error &e){
+        std::cout<<"Error occured, Error code = "<<e.code() 
+             <<" Message: "<<e.what();
+    }
 
-//   return 0;
+  return 0;
 
 }
