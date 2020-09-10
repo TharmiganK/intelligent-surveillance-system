@@ -40,7 +40,7 @@ void Processor::join() {
 
     streamReceiver1->join();
 
-    for (int i; i < videoStreams.size(); i++) {
+    for (int i = 0; i < videoStreams.size(); i++) {
 
         videoStreams[i]->CloseStream();
 
