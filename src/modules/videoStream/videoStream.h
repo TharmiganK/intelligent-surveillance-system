@@ -43,7 +43,6 @@ struct VideoStream {
 	AVStream *out_stream; /*!< Output video stream */
 	AVCodecContext *out_codec_ctx;  /*!< Video codec context */
 	std::string outputURL; /*!< Output stream URL */
-	std::string codec_profile; /*!< codec encoder profile */
 	int bitrate; /*!< Streaming bitrate*/
 	AVFrame *frame; /*!< frame for writing */
 	SwsContext *swsctx; /*!< Image convert context information (RGB->YUV) */
@@ -95,7 +94,7 @@ struct VideoStream {
 			@param Output format context to be initialized.
 			@param format name.
 		*/
-		void initialize_avformat_context(AVFormatContext *&fctx, const char *format_name);
+		void initialize_avformat_context(AVFormatContext *&fctx, const char *format_name, const char* output);
 
 		/**
 			@brief Initializing IO context.
@@ -122,7 +121,7 @@ struct VideoStream {
 			@param Codec encoder.
 			@param Codec profile (main | high10 | baseline| high422 | high444).
 		*/
-		void initialize_codec_stream(AVStream *&stream, AVCodecContext *&codec_ctx, AVCodec *&codec, std::string codec_profile);
+		void initialize_codec_stream(AVStream *&stream, AVCodecContext *&codec_ctx, AVCodec *&codec);
 
 		/**
 			@brief initializing sws_scaler context for converting context information.

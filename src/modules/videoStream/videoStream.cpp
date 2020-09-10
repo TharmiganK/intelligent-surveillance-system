@@ -22,9 +22,8 @@ VideoStream::VideoStream(int streamID, const char *streamURL, int queueCapacity)
 	videoStreamIndex(-1),
 	videoCodecCtx(NULL),
 	formatCtx(NULL),
-	outputURL("rtmp://localhost/live/"+std::to_string(streamID)),
-	bitrate(1000000),
-	codec_profile("high444")
+	outputURL("rtsp://localhost/live/"+std::to_string(streamID)),
+	bitrate(1000000)
     {
 	av_log_set_level(AV_LOG_DEBUG);
 	
@@ -137,12 +136,11 @@ bool VideoStream::CloseStream(){
 
     if (formatCtx){
 
-        BOOST_LOG_TRIVIAL(info) << "RTSP STREAM IS CLOSED SUCCESSFULLY.";
+        BOOST_LOG_TRIVIAL(info) << "RTSP INPUT STREAM IS CLOSED SUCCESSFULLY.";
         avformat_close_input(&formatCtx);
         formatCtx = NULL;
 
     }
-	
 
     return true;
 
@@ -188,7 +186,7 @@ void VideoStream::CloseVideoStream(){
 
     if (videoCodecCtx){
 
-        BOOST_LOG_TRIVIAL(info) << "VIDEO CODEC IS CLOSED SUCCESSFULLY.";
+        BOOST_LOG_TRIVIAL(info) << "VIDEO INPUT CODEC IS CLOSED SUCCESSFULLY.";
 
         avcodec_close(videoCodecCtx);
         videoCodecCtx = NULL;
@@ -198,9 +196,9 @@ void VideoStream::CloseVideoStream(){
 
 }
 
-void  VideoStream::initialize_avformat_context(AVFormatContext *&fctx, const char *format_name)
+void  VideoStream::initialize_avformat_context(AVFormatContext *&fctx, const char *format_name, const char* output)
 {
-	int ret = avformat_alloc_output_context2(&fctx, nullptr, format_name, nullptr);
+	int ret = avformat_alloc_output_context2(&fctx, nullptr, format_name, output);
 	if (ret < 0)
 	{
 		std::cout << "Could not allocate output format context!" << std::endl;
@@ -212,7 +210,7 @@ void VideoStream::initialize_io_context(AVFormatContext *&fctx, const char *outp
 {
 	if (!(fctx->oformat->flags & AVFMT_NOFILE))
 	{
-		int ret = avio_open2(&fctx->pb, output, AVIO_FLAG_WRITE, nullptr, nullptr);
+		int ret = avio_open(&fctx->pb, output, AVIO_FLAG_WRITE);
 		if (ret < 0)
 		{
 			std::cout << "Could not open output IO context!" << std::endl;
@@ -225,7 +223,7 @@ void VideoStream::set_codec_params(AVFormatContext *&fctx, AVCodecContext *&code
 {
 	const AVRational dst_fps = { fps, 1 };
 
-	codec_ctx->codec_tag = 0;
+	// codec_ctx->codec_tag = 0;
 	codec_ctx->codec_id = AV_CODEC_ID_H264;
 	codec_ctx->codec_type = AVMEDIA_TYPE_VIDEO;
 	codec_ctx->width = width;
@@ -241,7 +239,7 @@ void VideoStream::set_codec_params(AVFormatContext *&fctx, AVCodecContext *&code
 	}
 }
 
-void VideoStream::initialize_codec_stream(AVStream *&stream, AVCodecContext *&codec_ctx, AVCodec *&codec, std::string codec_profile)
+void VideoStream::initialize_codec_stream(AVStream *&stream, AVCodecContext *&codec_ctx, AVCodec *&codec)
 {
 	int ret = avcodec_parameters_from_context(stream->codecpar, codec_ctx);
 	if (ret < 0)
@@ -251,7 +249,6 @@ void VideoStream::initialize_codec_stream(AVStream *&stream, AVCodecContext *&co
 	}
 
 	AVDictionary *codec_options = nullptr;
-	av_dict_set(&codec_options, "profile", codec_profile.c_str(), 0);
 	av_dict_set(&codec_options, "preset", "superfast", 0);
 	av_dict_set(&codec_options, "tune", "zerolatency", 0);
 
@@ -308,25 +305,28 @@ void VideoStream::initializeOutputStream()
 	out_stream = nullptr;
 	out_codec_ctx = nullptr;
 
-	initialize_avformat_context(ofmt_ctx, "flv");
-	initialize_io_context(ofmt_ctx, output);
+	initialize_avformat_context(ofmt_ctx, "mp4", output);
 
 	out_codec = avcodec_find_encoder(AV_CODEC_ID_H264);
 	out_stream = avformat_new_stream(ofmt_ctx, out_codec);
+    out_stream->id = ofmt_ctx->nb_streams - 1;
 	out_codec_ctx = avcodec_alloc_context3(out_codec);
 
 	set_codec_params(ofmt_ctx, out_codec_ctx, width, height, 25, bitrate);
-	initialize_codec_stream(out_stream, out_codec_ctx, out_codec, codec_profile);
+	initialize_codec_stream(out_stream, out_codec_ctx, out_codec);
 
 	out_stream->codecpar->extradata = out_codec_ctx->extradata;
 	out_stream->codecpar->extradata_size = out_codec_ctx->extradata_size;
 
 	av_dump_format(ofmt_ctx, 0, output, 1);
+
+    initialize_io_context(ofmt_ctx, output);
+
 	//swsctx = initialize_sample_scaler(out_codec_ctx, width, height);
 	frame = allocate_frame_buffer(out_codec_ctx, width, height);
 
-
 	ret = avformat_write_header(ofmt_ctx, nullptr);
+
 	if (ret < 0)
 	{
 		std::cout << "Could not write header!" << std::endl;
