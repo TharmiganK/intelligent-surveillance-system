@@ -305,7 +305,7 @@ void VideoStream::initializeOutputStream()
 	out_stream = nullptr;
 	out_codec_ctx = nullptr;
 
-	initialize_avformat_context(ofmt_ctx, "mp4", output);
+	initialize_avformat_context(ofmt_ctx, "rtsp", output);
 
 	out_codec = avcodec_find_encoder(AV_CODEC_ID_H264);
 	out_stream = avformat_new_stream(ofmt_ctx, out_codec);
