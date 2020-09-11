@@ -42,9 +42,13 @@ struct VideoStream {
 	AVCodec *out_codec; /*!< Video codec encoder */
 	AVStream *out_stream; /*!< Output video stream */
 	AVCodecContext *out_codec_ctx;  /*!< Video codec context */
+    AVCodec *out_codec1; /*!< Video codec encoder */
+	AVStream *out_stream1; /*!< Output video stream */
+	AVCodecContext *out_codec_ctx1;  /*!< Video codec context */
 	std::string outputURL; /*!< Output stream URL */
 	int bitrate; /*!< Streaming bitrate*/
 	AVFrame *frame; /*!< frame for writing */
+    AVFrame *frame1; /*!< frame for writing */
 	SwsContext *swsctx; /*!< Image convert context information (RGB->YUV) */
 
 

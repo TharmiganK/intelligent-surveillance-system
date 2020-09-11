@@ -304,19 +304,35 @@ void VideoStream::initializeOutputStream()
 	out_codec = nullptr;
 	out_stream = nullptr;
 	out_codec_ctx = nullptr;
+    out_codec1 = nullptr;
+	out_stream1 = nullptr;
+	out_codec_ctx1 = nullptr;
 
 	initialize_avformat_context(ofmt_ctx, "rtsp", output);
 
 	out_codec = avcodec_find_encoder(AV_CODEC_ID_H264);
+    out_codec1 = avcodec_find_encoder(AV_CODEC_ID_H264);
+
 	out_stream = avformat_new_stream(ofmt_ctx, out_codec);
-    out_stream->id = ofmt_ctx->nb_streams - 1;
+    out_stream1 = avformat_new_stream(ofmt_ctx, out_codec1);
+
+    out_stream->id = ofmt_ctx->nb_streams - 2;
+    out_stream1->id = ofmt_ctx->nb_streams - 1;
+
 	out_codec_ctx = avcodec_alloc_context3(out_codec);
+    out_codec_ctx1 = avcodec_alloc_context3(out_codec1);
 
 	set_codec_params(ofmt_ctx, out_codec_ctx, width, height, 25, bitrate);
 	initialize_codec_stream(out_stream, out_codec_ctx, out_codec);
 
+    set_codec_params(ofmt_ctx, out_codec_ctx1, width, height, 25, bitrate);
+	initialize_codec_stream(out_stream1, out_codec_ctx1, out_codec1);
+
 	out_stream->codecpar->extradata = out_codec_ctx->extradata;
 	out_stream->codecpar->extradata_size = out_codec_ctx->extradata_size;
+
+    out_stream1->codecpar->extradata = out_codec_ctx1->extradata;
+	out_stream1->codecpar->extradata_size = out_codec_ctx1->extradata_size;
 
 	av_dump_format(ofmt_ctx, 0, output, 1);
 
@@ -324,6 +340,7 @@ void VideoStream::initializeOutputStream()
 
 	//swsctx = initialize_sample_scaler(out_codec_ctx, width, height);
 	frame = allocate_frame_buffer(out_codec_ctx, width, height);
+    frame1 = allocate_frame_buffer(out_codec_ctx1, width, height);
 
 	ret = avformat_write_header(ofmt_ctx, nullptr);
 

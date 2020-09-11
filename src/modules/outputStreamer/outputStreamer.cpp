@@ -11,7 +11,7 @@
 /**
 	@details convering frames to packet and write them 
 */
-void write_frame(AVCodecContext *codec_ctx, AVFormatContext *fmt_ctx, AVFrame *frame)
+void write_frame(AVCodecContext *codec_ctx, AVFormatContext *fmt_ctx, AVFrame *frame, int stream_index)
 {
 	AVPacket pkt = { 0 };
 	av_init_packet(&pkt);
@@ -29,6 +29,8 @@ void write_frame(AVCodecContext *codec_ctx, AVFormatContext *fmt_ctx, AVFrame *f
 		std::cout << "Error receiving packet from codec context!" << std::endl;
 		exit(1);
 	}
+
+    pkt.stream_index = stream_index;
 
 	av_interleaved_write_frame(fmt_ctx, &pkt);
 	av_packet_unref(&pkt);
@@ -59,11 +61,17 @@ void Streamer::operator()(tbb::concurrent_vector< std::shared_ptr< VideoStream >
 			    videoStream->frame->data[1] = channels[2].data;
 			    videoStream->frame->data[2] = channels[1].data;
 
+                videoStream->frame1->data[0] = channels[0].data;
+			    videoStream->frame1->data[1] = channels[2].data;
+			    videoStream->frame1->data[2] = channels[1].data;
+
 			    /*const int stride[] = { static_cast<int>(image.step[0]) };
 			    sws_scale(videoStream.swsctx, (uint8_t const * const *)&image.data, stride, 0, image.rows, videoStream.frame->data, videoStream.frame->linesize);
 			    */
 			    videoStreams[i]->frame->pts += av_rescale_q(1, videoStream->out_codec_ctx->time_base, videoStream->out_stream->time_base);
-			    write_frame(videoStream->out_codec_ctx, videoStream->ofmt_ctx, videoStream->frame);
+                videoStreams[i]->frame1->pts += av_rescale_q(1, videoStream->out_codec_ctx1->time_base, videoStream->out_stream1->time_base);
+			    write_frame(videoStream->out_codec_ctx, videoStream->ofmt_ctx, videoStream->frame, videoStream->out_stream->id);
+                write_frame(videoStream->out_codec_ctx1, videoStream->ofmt_ctx, videoStream->frame1, videoStream->out_stream1->id);
 			    count++;
 		    }
 
