@@ -1,16 +1,16 @@
 #include <opencv2/opencv.hpp>
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
-#include "zmq.hpp"
+#include <zmq.hpp>
 
-int publish () {
+int main () {
     //  Prepare our context and publisher
     zmq::context_t context(1);
     zmq::socket_t publisher(context, ZMQ_PUB);
     publisher.bind("tcp://*:5563");
 
     //std::string video_path = "http://192.168.1.3:8080/video";
-    cv::VideoCapture capture(0);
+    cv::VideoCapture capture("../../../../videos/TownCentreXVID.avi");
     cv::Mat frame;
 
     while (1) {

@@ -2,11 +2,10 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 //#include "zhelpers.hpp"
-#include "zmq.hpp"
+#include <zmq.hpp>
 
 
-
-int subscribe () {
+int main () {
     //  Prepare our context and subscriber
 
     zmq::context_t context(1);
