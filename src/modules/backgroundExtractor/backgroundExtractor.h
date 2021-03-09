@@ -34,7 +34,9 @@ class BackgroundExtractor {
 
     cv::Mat getForgroundMask();
 
-    void operator()(VideoStream& videoStream);
+    // void operator()(VideoStream& videoStream);
+
+    void operator()(VideoStream& videoStream, cv::Mat& frame);
 
 };
 
