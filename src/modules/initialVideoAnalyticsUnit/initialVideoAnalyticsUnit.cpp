@@ -13,8 +13,8 @@ void InitialVideoAnalyticsUnit::operator()(VideoStream& videoStream) {
 
         auto frame = videoStream.frameQueue.dequeueFrame();
 
-        std::thread backgroundExtractor1( BackgroundExtractor(False, 0), std::ref(videoStream), std::ref(frame));
-        std::thread opticalFlowEstimator1( OpticalFlowEstimator(False), std::ref(videoStream), std::ref(frame));
+        std::thread backgroundExtractor1( BackgroundExtractor(false, 0), std::ref(videoStream), std::ref(frame));
+        std::thread opticalFlowEstimator1( OpticalFlowEstimator(false), std::ref(videoStream), std::ref(frame));
 
         count ++;
     }
