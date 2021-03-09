@@ -37,8 +37,9 @@ class OpticalFlowEstimator {
     cv::Mat getFlow();
 
     // void operator()(VideoStream& videoStream);
-
-    void operator()(VideoStream& videoStream, cv::Mat& frame);
+    public :
+    
+        void operator()(VideoStream& videoStream, cv::Mat& frame);
 
 };
 
