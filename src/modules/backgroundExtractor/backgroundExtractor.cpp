@@ -54,16 +54,16 @@ cv::Mat BackgroundExtractor::getForgroundMask(){
 
 void BackgroundExtractor::operator()(VideoStream& videoStream, cv::Mat& frame){
     if (gpu){
-        background_subtractor -> apply(frame, fgMask);
-        background_subtractor -> getBackgroundImage(background);
-    }
-
-    else{
         frame_gpu.upload(frame);
         background_subtractor -> apply(frame_gpu, fgMask_gpu);
         background_subtractor -> getBackgroundImage(background_gpu);
         fgMask_gpu.download(fgMask);
         background_gpu.download(background);
+    }
+
+    else{
+        background_subtractor -> apply(frame, fgMask);
+        background_subtractor -> getBackgroundImage(background);
     }
 
     //videostream.backgroundqueue->enque
