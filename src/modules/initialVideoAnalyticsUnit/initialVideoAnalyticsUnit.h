@@ -14,9 +14,10 @@
 
 class InitialVideoAnalyticsUnit {
 
-    InitialVideoAnalyticsUnit(){};
-
     public :
+
+        InitialVideoAnalyticsUnit(){};
+
         void operator()(VideoStream& videoStream);
 
 };

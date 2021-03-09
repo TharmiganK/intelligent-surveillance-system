@@ -28,15 +28,15 @@ class BackgroundExtractor {
     bool gpu;
     int delay;
 
-    BackgroundExtractor(bool gpu, int delay);
+    public:
+    
+        BackgroundExtractor(bool gpu, int delay);
 
-    cv::Mat getBackground();
+        cv::Mat getBackground();
 
-    cv::Mat getForgroundMask();
+        cv::Mat getForgroundMask();
 
-    // void operator()(VideoStream& videoStream);
-
-    public :
+        // void operator()(VideoStream& videoStream);
     
         void operator()(VideoStream& videoStream, cv::Mat& frame);
 

@@ -32,13 +32,14 @@ class OpticalFlowEstimator {
     cv::cuda::GpuMat flow_gpu;
     bool gpu;
 
-    OpticalFlowEstimator(bool gpu);
-
-    cv::Mat getFlow();
-
-    // void operator()(VideoStream& videoStream);
     public :
-    
+
+        OpticalFlowEstimator(bool gpu);
+
+        cv::Mat getFlow();
+
+        // void operator()(VideoStream& videoStream);
+
         void operator()(VideoStream& videoStream, cv::Mat& frame);
 
 };
