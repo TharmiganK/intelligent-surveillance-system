@@ -15,6 +15,8 @@ VideoStream::VideoStream(int streamID, const char *streamURL, int queueCapacity)
 	streamID(streamID),
 	streamURL(streamURL),
 	frameQueue(streamID, queueCapacity),
+	fgMaskQueue(streamID, queueCapacity),
+	opticalFlowQueue(streamID, queueCapacity),
 	packetQueue(streamID, queueCapacity),
 	videoBaseTime(0.0),
 	videoFPS(0.0),

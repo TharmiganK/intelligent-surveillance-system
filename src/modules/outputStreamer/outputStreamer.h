@@ -33,6 +33,6 @@ public:
 		@param frameQueue reference to the frame queue from which frames should be taken.
 	*/
 	//void operator()(FrameQueue& frameQueue);
-	void operator()(VideoStream& videoStream);
+	void operator()(VideoStream& videoStream, int select_queue);
 };
 

@@ -24,6 +24,8 @@ struct VideoStream {
 
     int streamID; /*!< ID of the associated video stream */
     FrameQueue frameQueue; /*!< Queue to store the frames */
+	FrameQueue fgMaskQueue; 
+	FrameQueue opticalFlowQueue;
     PacketQueue packetQueue; /*!< Queue to store the packets */
     const char *streamURL; /*!< URL of the associated video stream */
     AVFormatContext* formatCtx; /*!< RTSP stream format context information */

@@ -66,6 +66,27 @@ void BackgroundExtractor::operator()(VideoStream& videoStream, cv::Mat& frame){
         background_subtractor -> getBackgroundImage(background);
     }
 
-    //videostream.backgroundqueue->enque
+    videoStream.fgMaskQueue.enqueueFrame(fgMask.clone());
 
+}
+
+void BackgroundExtractor::compute(VideoStream& videoStream, cv::Mat frame){
+    if (gpu){
+        frame_gpu.upload(frame);
+        background_subtractor -> apply(frame_gpu, fgMask_gpu);
+        background_subtractor -> getBackgroundImage(background_gpu);
+        fgMask_gpu.download(fgMask);
+        background_gpu.download(background);
+    }
+
+    else{
+        background_subtractor -> apply(frame, fgMask);
+        background_subtractor -> getBackgroundImage(background);
+    }
+
+    videoStream.fgMaskQueue.enqueueFrame(fgMask.clone());
+
+    BOOST_LOG_TRIVIAL(info) << "Extracted Foreground frame : " << count << " from stream ID : " << videoStream.streamID;
+
+    count ++;
 }

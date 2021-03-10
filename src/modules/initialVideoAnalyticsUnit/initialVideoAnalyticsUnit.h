@@ -9,6 +9,7 @@
 
 #include "../backgroundExtractor/backgroundExtractor.h"
 #include "../opticalFlowEstimator/opticalFlowEstimator.h"
+#include "../outputStreamer/outputStreamer.h"
 #include <thread>
 #include <iostream>
 
@@ -16,7 +17,7 @@ class InitialVideoAnalyticsUnit {
 
     public :
 
-        InitialVideoAnalyticsUnit(){};
+        // InitialVideoAnalyticsUnit(){};
 
         void operator()(VideoStream& videoStream);
 

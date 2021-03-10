@@ -16,6 +16,7 @@
 #include <opencv2/cudaarithm.hpp>
 #include <opencv2/cudabgsegm.hpp>
 #include "../videoStream/videoStream.h"
+#include <boost/log/trivial.hpp>
 
 class BackgroundExtractor {
 
@@ -27,6 +28,7 @@ class BackgroundExtractor {
     cv::cuda::GpuMat background_gpu;
     bool gpu;
     int delay;
+    int count = 0;
 
     public:
     
@@ -39,6 +41,8 @@ class BackgroundExtractor {
         // void operator()(VideoStream& videoStream);
     
         void operator()(VideoStream& videoStream, cv::Mat& frame);
+
+        void compute(VideoStream& videoStream, cv::Mat frame);
 
 };
 

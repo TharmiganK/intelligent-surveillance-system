@@ -38,28 +38,110 @@ void write_frame(AVCodecContext *codec_ctx, AVFormatContext *fmt_ctx, AVFrame *f
 	@details dequeue from the buffer, make the frame,
 	adding time details to the frames
 */
-void Streamer::operator()(VideoStream& videoStream){
+// void Streamer::operator()(VideoStream& videoStream){
+// 	int count = 0;
+// 	while (count < MAX_NUM_FRAMES) {
+// 		if (!videoStream.frameQueue.queueIsEmpty()) {
+
+// 			auto image = videoStream.frameQueue.dequeueFrame();
+// 			cv::Mat img_out;
+// 			cv::cvtColor(image, img_out, cv::COLOR_RGB2YUV);
+			
+// 			std::vector<cv::Mat> channels(3);
+// 			split(img_out, channels);
+
+// 			videoStream.frame->data[0] = channels[0].data;
+// 			videoStream.frame->data[1] = channels[2].data;
+// 			videoStream.frame->data[2] = channels[1].data;
+
+// 			/*const int stride[] = { static_cast<int>(image.step[0]) };
+// 			sws_scale(videoStream.swsctx, (uint8_t const * const *)&image.data, stride, 0, image.rows, videoStream.frame->data, videoStream.frame->linesize);
+// 			*/
+// 			videoStream.frame->pts += av_rescale_q(1, videoStream.out_codec_ctx->time_base, videoStream.out_stream->time_base);
+// 			write_frame(videoStream.out_codec_ctx, videoStream.ofmt_ctx, videoStream.frame);
+// 			count++;
+// 		}
+// 	}
+// 	av_write_trailer(videoStream.ofmt_ctx);
+// 	//sws_freeContext(swsctx);
+// 	av_frame_free(&videoStream.frame);
+// 	avcodec_close(videoStream.out_codec_ctx);
+// 	avio_close(videoStream.ofmt_ctx->pb);
+// 	avformat_free_context(videoStream.ofmt_ctx);
+
+// }
+
+void Streamer::operator()(VideoStream& videoStream, int select_queue){
 	int count = 0;
 	while (count < MAX_NUM_FRAMES) {
-		if (!videoStream.frameQueue.queueIsEmpty()) {
+		if (select_queue == 0) {
+			if (!videoStream.frameQueue.queueIsEmpty()) {
 
-			auto image = videoStream.frameQueue.dequeueFrame();
-			cv::Mat img_out;
-			cv::cvtColor(image, img_out, cv::COLOR_RGB2YUV);
+				auto image = videoStream.frameQueue.dequeueFrame();
+				cv::Mat img_out;
+				cv::cvtColor(image, img_out, cv::COLOR_RGB2YUV);
 			
-			std::vector<cv::Mat> channels(3);
-			split(img_out, channels);
+				std::vector<cv::Mat> channels(3);
+				split(img_out, channels);
 
-			videoStream.frame->data[0] = channels[0].data;
-			videoStream.frame->data[1] = channels[2].data;
-			videoStream.frame->data[2] = channels[1].data;
+				videoStream.frame->data[0] = channels[0].data;
+				videoStream.frame->data[1] = channels[2].data;
+				videoStream.frame->data[2] = channels[1].data;
 
-			/*const int stride[] = { static_cast<int>(image.step[0]) };
-			sws_scale(videoStream.swsctx, (uint8_t const * const *)&image.data, stride, 0, image.rows, videoStream.frame->data, videoStream.frame->linesize);
-			*/
-			videoStream.frame->pts += av_rescale_q(1, videoStream.out_codec_ctx->time_base, videoStream.out_stream->time_base);
-			write_frame(videoStream.out_codec_ctx, videoStream.ofmt_ctx, videoStream.frame);
-			count++;
+				/*const int stride[] = { static_cast<int>(image.step[0]) };
+				sws_scale(videoStream.swsctx, (uint8_t const * const *)&image.data, stride, 0, image.rows, videoStream.frame->data, videoStream.frame->linesize);
+				*/
+				videoStream.frame->pts += av_rescale_q(1, videoStream.out_codec_ctx->time_base, videoStream.out_stream->time_base);
+				write_frame(videoStream.out_codec_ctx, videoStream.ofmt_ctx, videoStream.frame);
+				count++;
+			}
+		}
+
+		else if (select_queue == 1) {
+			if (!videoStream.fgMaskQueue.queueIsEmpty()) {
+
+				auto image_gray = videoStream.fgMaskQueue.dequeueFrame();
+				cv::Mat img_out, image;
+				cv::cvtColor(image_gray, image, cv::COLOR_GRAY2RGB );
+				cv::cvtColor(image, img_out, cv::COLOR_RGB2YUV);
+			
+				std::vector<cv::Mat> channels(3);
+				split(img_out, channels);
+
+				videoStream.frame->data[0] = channels[0].data;
+				videoStream.frame->data[1] = channels[2].data;
+				videoStream.frame->data[2] = channels[1].data;
+
+				/*const int stride[] = { static_cast<int>(image.step[0]) };
+				sws_scale(videoStream.swsctx, (uint8_t const * const *)&image.data, stride, 0, image.rows, videoStream.frame->data, videoStream.frame->linesize);
+				*/
+				videoStream.frame->pts += av_rescale_q(1, videoStream.out_codec_ctx->time_base, videoStream.out_stream->time_base);
+				write_frame(videoStream.out_codec_ctx, videoStream.ofmt_ctx, videoStream.frame);
+				count++;
+			}
+		}
+
+		else if (select_queue == 2) {
+			if (!videoStream.opticalFlowQueue.queueIsEmpty()) {
+
+				auto image = videoStream.opticalFlowQueue.dequeueFrame();
+				cv::Mat img_out;
+				cv::cvtColor(image, img_out, cv::COLOR_RGB2YUV);
+			
+				std::vector<cv::Mat> channels(3);
+				split(img_out, channels);
+
+				videoStream.frame->data[0] = channels[0].data;
+				videoStream.frame->data[1] = channels[2].data;
+				videoStream.frame->data[2] = channels[1].data;
+
+				/*const int stride[] = { static_cast<int>(image.step[0]) };
+				sws_scale(videoStream.swsctx, (uint8_t const * const *)&image.data, stride, 0, image.rows, videoStream.frame->data, videoStream.frame->linesize);
+				*/
+				videoStream.frame->pts += av_rescale_q(1, videoStream.out_codec_ctx->time_base, videoStream.out_stream->time_base);
+				write_frame(videoStream.out_codec_ctx, videoStream.ofmt_ctx, videoStream.frame);
+				count++;
+			}
 		}
 	}
 	av_write_trailer(videoStream.ofmt_ctx);

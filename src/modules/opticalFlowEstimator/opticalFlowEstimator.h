@@ -18,6 +18,7 @@
 #include <opencv2/highgui.hpp>
 #include "opencv2/cudaarithm.hpp"
 #include "../videoStream/videoStream.h"
+#include <boost/log/trivial.hpp>
 
 class OpticalFlowEstimator {
 
@@ -30,6 +31,7 @@ class OpticalFlowEstimator {
     cv::Ptr<cv::cuda::FarnebackOpticalFlow> farnebackOpticalFlow;
     cv::cuda::GpuMat frame_gpu;
     cv::cuda::GpuMat flow_gpu;
+    int count = 0;
     bool gpu;
 
     public :
@@ -42,6 +44,7 @@ class OpticalFlowEstimator {
 
         void operator()(VideoStream& videoStream, cv::Mat& frame);
 
+        void compute(VideoStream& videoStream, cv::Mat frame);
 };
 
 #endif
